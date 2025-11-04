@@ -1,5 +1,5 @@
 site_name: SNRAware
-repo_url: "https://github.com/health-futures/SNRAware"
+repo_url: "https://github.com/microsoft/SNRAware"
 repo_name: "SNRAware"
 docs_dir: "docs"
 site_dir: "dist/site"

@@ -24,7 +24,7 @@ jobs:
         run: |
           uv version "$PACKAGE_VERSION"
           uv sync
-          mkdocs build
+          uv run mkdocs build
       - name: "upload-gh-pages"
         uses: actions/upload-pages-artifact@v4
         with:

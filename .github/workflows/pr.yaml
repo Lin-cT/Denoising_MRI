@@ -22,6 +22,11 @@ jobs:
     secrets: inherit
     with:
       sha: ${{ github.sha }}
+  build-containers:
+    uses: ./.github/workflows/build-containers.yaml
+    secrets: inherit
+    with:
+      sha: ${{ github.sha }}
   build-docs:
     uses: ./.github/workflows/build-docs.yaml
     secrets: inherit
@@ -36,6 +41,7 @@ jobs:
     uses: ./.github/workflows/release.yaml
     secrets: inherit
     needs:
+      - build-containers
       - build-docs
       - build-wheels
       - checks

@@ -1,1 +1,1 @@
-# SNRAware
+docs/index.md

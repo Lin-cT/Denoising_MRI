@@ -27,10 +27,3 @@ jobs:
           uv run ruff check
           uv run pyright
           uv run pytest
-      - name: upload-coverage
-        uses: codecov/codecov-action@v5.5.1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          slug: microsoft/SNRAware
-          name: snraware
-          verbose: true

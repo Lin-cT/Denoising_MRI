@@ -420,3 +420,4 @@ FodyWeavers.xsd
 # added by the team
 .idea
 .python-version
+dist

@@ -28,7 +28,31 @@ abstract = { Purpose To develop and evaluate a novel deep learning-based MRI den
 
 ## Get started
 
+[just](https://github.com/casey/just) is used in this project. If not, please install this tool:
 
+```bash
+# install just
+wget -qO - 'https://proget.makedeb.org/debian-feeds/prebuilt-mpr.pub' | gpg --dearmor | sudo tee /usr/share/keyrings/prebuilt-mpr-archive-keyring.gpg 1> /dev/null
+echo "deb [arch=all,$(dpkg --print-architecture) signed-by=/usr/share/keyrings/prebuilt-mpr-archive-keyring.gpg] https://proget.makedeb.org prebuilt-mpr $(lsb_release -cs)" | sudo tee /etc/apt/sources.list.d/prebuilt-mpr.list
+sudo apt update
+sudo apt install just -y
+```
+
+Then, please set up the virtual environment and run tests:
+
+```bash
+# show the list
+just --list
+
+# set up virtual environment
+just setup-env
+
+# review documentation
+just serve-docs
+
+# run test
+just test
+```
 
 ## Data
 Dataset for MR denoising training is not opened at this moment.

@@ -52,8 +52,6 @@ just test
 ## Data
 Dataset for MR denoising training is not opened at this moment.
 
-## Run model training
-
 ## Direct intended uses
 SNRAware is shared for research purposes only, namely, benchmarking and inference on downstream
 tasks. This is a research model which should not be used in any clinical or production scenario.

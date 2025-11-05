@@ -10,3 +10,16 @@ set shell := ['bash', '-ceuo', 'pipefail']
 
 @test:
     pytest
+
+@build-package:
+    uv build
+
+@build-docs:
+    mkdocs build
+
+@serve-docs:
+    mkdocs serve
+
+@setup-env:
+    uv sync
+    direnv allow .

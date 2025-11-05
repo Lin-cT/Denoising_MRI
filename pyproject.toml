@@ -1,6 +1,6 @@
 [project]
 name = "snraware"
-description = ""
+description = "A deep learning imaging AI framework"
 version = "0.1.0"
 readme = "README.md"
 requires-python = ">=3.12,<4.0"
@@ -9,7 +9,43 @@ authors = [
 ]
 keywords = []
 license = "MIT"
-dependencies = []
+dependencies = [
+    "mkl-fft>=2.0.0",
+    "mkl-service>=2.4.2",
+    "typing_extensions",
+    "click",
+    "h5py",
+    "opencv-python",
+    "pathlib",
+    "PyWavelets",
+    "pytorch-wavelets",
+    "torchmetrics==1.7.3",
+    "torch-interpol",
+    "piq",
+    "imageio",
+    "pyyaml",
+    "wandb",
+    "wandb[media]",
+    "scipy",
+    "cffi",
+    "numpy>=2.2.6",
+    "torch>=2.8.0",
+    "setuptools",
+    "torchvision",
+    "torchinfo",
+    "prettytable",
+    "scikit-image",
+    "nibabel",
+    "matplotlib",
+    "einops",
+    "pandas",
+    "lightning",
+    "hydra-core",
+    "omegaconf",
+    "hydra_colorlog",
+    "pytest>=8.4.2",
+    "dvc[azure]",
+]
 
 [project.urls]
 repository = "https://github.com/microsoft/SNRAware"
@@ -41,6 +77,15 @@ build-backend = "uv_build"
 
 [tool.uv.build-backend]
 module-name = ["snraware"]
+
+[[tool.uv.index]]
+name = "mkl"
+url = "https://urob.github.io/numpy-mkl"
+
+[tool.uv.sources]
+numpy = { index = "mkl" }
+scipy = { index = "mkl" }
+mkl-service = { index = "mkl" }
 
 [project.scripts]
 
@@ -186,3 +231,7 @@ addopts = """
     --cov-branch
     --cache-clear
 """
+markers = [
+    "gpu: a test needs gpus to run",
+    "slow: mark a test as slow",
+]

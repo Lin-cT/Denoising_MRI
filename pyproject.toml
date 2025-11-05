@@ -230,6 +230,7 @@ addopts = """
     --capture=no
     --cov-branch
     --cache-clear
+    -m 'not gpu'
 """
 markers = [
     "gpu: a test needs gpus to run",

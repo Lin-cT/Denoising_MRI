@@ -293,10 +293,3 @@ class TestSNRNoise:
             assert abs(std_nns_imag - nn_gen.actual_sigma_white_noise_imag) / abs(std_nns_imag) < 0.02
 
     # ---------------------------------------------------------------
-
-
-if __name__ == "__main__":
-    t = TestSNRNoise()
-    t.setup_class()
-    t.test_signal_level_after_partial_fourier()
-    t.teardown_class()

@@ -139,7 +139,14 @@ class TestDenoising:
         self.load_and_test_saved_model(cfg)
 
     @pytest.mark.gpu
-    def test_training_single_epoch(self):
+    def test_training_single_epoch(self, request):
+        selected_markers = request.config.getoption("-m")
+        if "gpu" not in selected_markers:
+            pytest.skip("Skipping because marker 'gpu' is not set")
+
+        if os.path.exists(self.data_root) is False or os.path.exists(self.test_root) is False:
+            pytest.skip("Skipping because test data not found")
+
         with initialize(version_base=None, config_path="../src/snraware/projects/mri/denoising/configs"):
             cfg = compose(
                 config_name="config",
@@ -166,6 +173,3 @@ class TestDenoising:
         assert test_res[0]["test/PSNR"] > 40, f"Expected test PSNR > 40, got {test_res[0]['test/PSNR']}"
 
         self.load_and_test_saved_model(cfg)
-
-if __name__ == "__main__":
-    pass

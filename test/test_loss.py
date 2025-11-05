@@ -124,6 +124,3 @@ class TestLoss:
 
     def test_loss_magnitude(self):
         self.run_loss(complex=False)
-
-if __name__ == "__main__":
-    pass

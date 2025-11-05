@@ -182,7 +182,11 @@ class TestTrain:
         "backbone",
         ["soanet", "hrnet", "unet"],
     )
-    def test_trainer(self, backbone):
+    def test_trainer(self, backbone, request):       
+        selected_markers = request.config.getoption("-m")
+        if "gpu" not in selected_markers:
+            pytest.skip("Skipping because marker 'gpu' is not set")
+            
         overrides = [
             f"backbone={backbone}",
             "backbone.block.cell.window_size=[4,4,1]",
@@ -257,10 +261,3 @@ class TestTrain:
         test_res = trainer.test(model=lit_model, datamodule=data_module, ckpt_path="best")
 
         assert test_res[0]["test_mse"] < 0.5, "Test MSE is higher than 0.5, indicating poor model performance."
-
-
-if __name__ == "__main__":
-    t = TestTrain()
-    t.setup_class()
-    t.test_trainer(backbone="hrnet")
-    t.teardown_class()

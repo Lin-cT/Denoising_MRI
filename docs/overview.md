@@ -7,9 +7,7 @@ As an example, this is a `2D+T` case. Here we have F=30 frames to capture the be
 
 ![ch4](images/ch4.gif)
 
-For a 2D case, such as the chest x-ray image, the F is 1:
-
-![chest_x_ray](images/chest_x_ray.png)
+For a 2D case, such as the chest x-ray image, the F is 1.
 
 This package implemented building blocks to help develop AI models to process the 5D tensors. To standardize and simplify this process, all components take in a 5D tensor and output another 5D tensor. The number of channels can be increased or decreased,  but most components will keep the `F, H, W` unchanged. The explicit down/upsampling layers are inserted into the model to alter these dimensions if needed.
 

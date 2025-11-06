@@ -93,15 +93,21 @@ class TestCell:
                                         ).to(device=device)
                                         test_out = CNNT_Cell(x)
 
-                                        gt_fname = os.path.join(self.data_root, f"test_out_STCNNT_Cell_{fname}.npy")
+                                        gt_fname = os.path.join(
+                                            self.data_root, f"test_out_STCNNT_Cell_{fname}.npy"
+                                        )
                                         # np.save(gt_fname, test_out.detach().cpu().numpy())
                                         assert os.path.exists(gt_fname)
                                         test_out_gt = np.load(
-                                            os.path.join(self.data_root, f"test_out_STCNNT_Cell_{fname}.npy")
+                                            os.path.join(
+                                                self.data_root, f"test_out_STCNNT_Cell_{fname}.npy"
+                                            )
                                         )
                                         test_out_gt = np.transpose(test_out_gt, [0, 2, 1, 3, 4])
                                         assert (
-                                            np.linalg.norm(test_out_gt - test_out.detach().cpu().numpy())
+                                            np.linalg.norm(
+                                                test_out_gt - test_out.detach().cpu().numpy()
+                                            )
                                             / np.linalg.norm(test_out_gt)
                                             < 1e-3
                                         )
@@ -137,16 +143,22 @@ class TestCell:
                                     test_out = p_cell(test_in)
 
                                     gt_fname = os.path.join(
-                                        self.data_root, f"test_out_STCNNT_Parallel_Cell_{fname}.npy"
+                                        self.data_root,
+                                        f"test_out_STCNNT_Parallel_Cell_{fname}.npy",
                                     )
                                     # np.save(gt_fname, test_out.detach().cpu().numpy())
                                     assert os.path.exists(gt_fname)
                                     test_out_gt = np.load(
-                                        os.path.join(self.data_root, f"test_out_STCNNT_Parallel_Cell_{fname}.npy")
+                                        os.path.join(
+                                            self.data_root,
+                                            f"test_out_STCNNT_Parallel_Cell_{fname}.npy",
+                                        )
                                     )
                                     test_out_gt = np.transpose(test_out_gt, [0, 2, 1, 3, 4])
                                     assert (
-                                        np.linalg.norm(test_out_gt - test_out.detach().cpu().numpy())
+                                        np.linalg.norm(
+                                            test_out_gt - test_out.detach().cpu().numpy()
+                                        )
                                         / np.linalg.norm(test_out_gt)
                                         < 1e-3
                                     )

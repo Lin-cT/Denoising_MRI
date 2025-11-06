@@ -46,7 +46,9 @@ def fft3c(image, norm="ortho"):
     Returns:
         res: fft3c results
     """
-    return fftshift(fftn(ifftshift(image, axes=(0, 1, 2)), axes=(0, 1, 2), norm=norm), axes=(0, 1, 2))
+    return fftshift(
+        fftn(ifftshift(image, axes=(0, 1, 2)), axes=(0, 1, 2), norm=norm), axes=(0, 1, 2)
+    )
 
 
 # --------------------------------------------------------------
@@ -92,7 +94,9 @@ def ifft3c(kspace, norm="ortho"):
     Returns:
         res: fft3c results
     """
-    return fftshift(ifftn(ifftshift(kspace, axes=(0, 1, 2)), axes=(0, 1, 2), norm=norm), axes=(0, 1, 2))
+    return fftshift(
+        ifftn(ifftshift(kspace, axes=(0, 1, 2)), axes=(0, 1, 2), norm=norm), axes=(0, 1, 2)
+    )
 
 
 # --------------------------------------------------------------

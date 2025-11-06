@@ -57,16 +57,36 @@ class TemporalCnnAttentionBase(CnnAttentionBase):
         # key, query, value projections convolution
         # Wk, Wq, Wv
         self.key = Conv2DExt(
-            C_in, C_out, kernel_size=kernel_size, stride=stride_qk, padding=padding, bias=True, channel_first=False
+            C_in,
+            C_out,
+            kernel_size=kernel_size,
+            stride=stride_qk,
+            padding=padding,
+            bias=True,
+            channel_first=False,
         )
         self.query = Conv2DExt(
-            C_in, C_out, kernel_size=kernel_size, stride=stride_qk, padding=padding, bias=True, channel_first=False
+            C_in,
+            C_out,
+            kernel_size=kernel_size,
+            stride=stride_qk,
+            padding=padding,
+            bias=True,
+            channel_first=False,
         )
         self.value = Conv2DExt(
-            C_in, C_out, kernel_size=kernel_size, stride=stride, padding=padding, bias=True, channel_first=False
+            C_in,
+            C_out,
+            kernel_size=kernel_size,
+            stride=stride,
+            padding=padding,
+            bias=True,
+            channel_first=False,
         )
 
-        self.register_buffer("mask", torch.tril(torch.ones(1000, 1000, dtype=torch.bool)).view(1, 1, 1000, 1000))
+        self.register_buffer(
+            "mask", torch.tril(torch.ones(1000, 1000, dtype=torch.bool)).view(1, 1, 1000, 1000)
+        )
 
     def attention(self, k, q, v):
         raise NotImplementedError("This function is to be implemented by the subclass")
@@ -81,7 +101,9 @@ class TemporalCnnAttentionBase(CnnAttentionBase):
         """
         _B, C, _T, _H, _W = x.size()
 
-        assert C == self.C_in, f"Input channel {C} does not match expected input channel {self.C_in}"
+        assert C == self.C_in, (
+            f"Input channel {C} does not match expected input channel {self.C_in}"
+        )
 
         x = torch.permute(x, [0, 2, 1, 3, 4])
 
@@ -151,7 +173,9 @@ class TemporalChannelCnnAttention(TemporalCnnAttentionBase):
             f"Number of output channel {self.C_out} should be divisible by number of heads {self.n_head}"
         )
 
-        print(f"{Fore.CYAN}--> Temporal, attention on channels only, C_in {C_in}, C_out {C_out}{Style.RESET_ALL}")
+        print(
+            f"{Fore.CYAN}--> Temporal, attention on channels only, C_in {C_in}, C_out {C_out}{Style.RESET_ALL}"
+        )
 
     def attention(self, k, q, v):
         B, T, C_prime, H_prime, W_prime = k.shape
@@ -191,7 +215,11 @@ class TemporalChannelCnnAttention(TemporalCnnAttentionBase):
                 if self.normalize_Q_K:
                     q, k = normalize_qk(q, k)
 
-                att = q @ k.transpose(-2, -1) / torch.sqrt(torch.tensor(1.0 * hc * H_prime * W_prime))
+                att = (
+                    q
+                    @ k.transpose(-2, -1)
+                    / torch.sqrt(torch.tensor(1.0 * hc * H_prime * W_prime))
+                )
             end_timer(enable=self.with_timer, t=tm, msg="att")
 
             if self.is_causal:

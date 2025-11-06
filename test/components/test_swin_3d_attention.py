@@ -46,7 +46,14 @@ class TestSwin3DAttention:
         W = test_in.shape[-1]
 
         att = Swin3DAttention(
-            H=H, W=W, D=D, window_size=None, num_wind=[4, 4, 2], attention_type="conv", C_in=C, C_out=C_out
+            H=H,
+            W=W,
+            D=D,
+            window_size=None,
+            num_wind=[4, 4, 2],
+            attention_type="conv",
+            C_in=C,
+            C_out=C_out,
         )
 
         a = att.im2grid(torch.permute(test_in, [0, 2, 1, 3, 4]))
@@ -92,7 +99,9 @@ class TestSwin3DAttention:
                         for att_with_relative_position_bias in att_with_relative_position_biases:
                             for stride_qk in stride_qks:
                                 fname = f"{attention_type}_{normalize_Q_K}_{att_with_output_proj}_{cosine_att}_{att_with_relative_position_bias}_{stride_qk}"
-                                print(f"{Fore.YELLOW}run - {fname}, {torch.linalg.norm(test_in)}{Style.RESET_ALL}")
+                                print(
+                                    f"{Fore.YELLOW}run - {fname}, {torch.linalg.norm(test_in)}{Style.RESET_ALL}"
+                                )
 
                                 att = Swin3DAttention(
                                     window_size=None,
@@ -113,7 +122,11 @@ class TestSwin3DAttention:
 
                                 t0 = start_timer(enable=with_timer)
                                 test_out = att(test_in)
-                                end_timer(enable=with_timer, t=t0, msg=f"forward pass - test_in {test_in.shape}")
+                                end_timer(
+                                    enable=with_timer,
+                                    t=t0,
+                                    msg=f"forward pass - test_in {test_in.shape}",
+                                )
 
                                 gt_fname = os.path.join(self.data_root, f"test_out_{fname}.npy")
                                 # np.save(gt_fname, test_out.detach().cpu().numpy())
@@ -154,7 +167,11 @@ class TestSwin3DAttention:
                                     t0 = start_timer(enable=with_timer)
                                     with torch.inference_mode():
                                         test_out = att(test_in2)
-                                    end_timer(enable=with_timer, t=t0, msg=f"forward pass - test_in2 {test_in2.shape}")
+                                    end_timer(
+                                        enable=with_timer,
+                                        t=t0,
+                                        msg=f"forward pass - test_in2 {test_in2.shape}",
+                                    )
 
 
 if __name__ == "__main__":

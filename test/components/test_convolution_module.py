@@ -80,7 +80,11 @@ class TestConvolutionModule:
             assert os.path.exists(gt_fname)
             test_out_gt = np.load(os.path.join(self.data_root, f"test_out_{fname}.npy"))
             test_out_gt = np.transpose(test_out_gt, [0, 2, 1, 3, 4])
-            assert np.linalg.norm(test_out_gt - test_out.detach().cpu().numpy()) / np.linalg.norm(test_out_gt) < 1e-3
+            assert (
+                np.linalg.norm(test_out_gt - test_out.detach().cpu().numpy())
+                / np.linalg.norm(test_out_gt)
+                < 1e-3
+            )
 
             t0 = start_timer(enable=with_timer)
             loss = torch.nn.MSELoss()

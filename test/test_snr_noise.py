@@ -77,8 +77,12 @@ class TestSNRNoise:
         RO, E1 = self.im.shape[:2]
 
         # reduce the size of input image
-        im_low_matrix = apply_matrix_size_reduction_2D(self.im, int(0.8 * RO), int(0.8 * E1), norm="ortho")
-        mask_low_matrix = cv2.resize(self.mask, dsize=[int(0.8 * RO), int(0.8 * E1)], interpolation=cv2.INTER_NEAREST)
+        im_low_matrix = apply_matrix_size_reduction_2D(
+            self.im, int(0.8 * RO), int(0.8 * E1), norm="ortho"
+        )
+        mask_low_matrix = cv2.resize(
+            self.mask, dsize=[int(0.8 * RO), int(0.8 * E1)], interpolation=cv2.INTER_NEAREST
+        )
 
         signal_level = np.abs(np.mean(self.im[self.mask > 0.1]))
         signal_level_low_matrix = np.abs(np.mean(im_low_matrix[mask_low_matrix > 0.1]))
@@ -92,7 +96,9 @@ class TestSNRNoise:
         im_low_matrix = apply_matrix_size_reduction_2D(
             self.im, int(0.8 * self.im.shape[1]), int(0.8 * self.im.shape[2]), norm="ortho"
         )
-        mask_low_matrix = cv2.resize(self.mask, dsize=im_low_matrix.shape[1::-1], interpolation=cv2.INTER_NEAREST)
+        mask_low_matrix = cv2.resize(
+            self.mask, dsize=im_low_matrix.shape[1::-1], interpolation=cv2.INTER_NEAREST
+        )
         signal_level_low_matrix = np.abs(np.mean(im_low_matrix[mask_low_matrix > 0.1]))
 
         ratio_RO = 0.57
@@ -101,8 +107,14 @@ class TestSNRNoise:
             im_low_matrix, ratio_RO, ratio_E1, snr_scaling=False, norm="backward"
         )
 
-        signal_level_low_matrix_low_res = np.abs(np.mean(im_low_matrix_low_res[mask_low_matrix > 0.1]))
-        assert abs(signal_level_low_matrix - signal_level_low_matrix_low_res) / abs(signal_level_low_matrix) < 0.02
+        signal_level_low_matrix_low_res = np.abs(
+            np.mean(im_low_matrix_low_res[mask_low_matrix > 0.1])
+        )
+        assert (
+            abs(signal_level_low_matrix - signal_level_low_matrix_low_res)
+            / abs(signal_level_low_matrix)
+            < 0.02
+        )
 
     # ---------------------------------------------------------------
     def test_signal_level_after_partial_fourier(self):
@@ -110,7 +122,9 @@ class TestSNRNoise:
         im_low_matrix = apply_matrix_size_reduction_2D(
             self.im, int(0.8 * self.im.shape[1]), int(0.8 * self.im.shape[2]), norm="ortho"
         )
-        mask_low_matrix = cv2.resize(self.mask, dsize=im_low_matrix.shape[1::-1], interpolation=cv2.INTER_NEAREST)
+        mask_low_matrix = cv2.resize(
+            self.mask, dsize=im_low_matrix.shape[1::-1], interpolation=cv2.INTER_NEAREST
+        )
         signal_level_low_matrix = np.abs(np.mean(im_low_matrix[mask_low_matrix > 0.1]))
 
         pf_ratio_RO = 0.57
@@ -133,7 +147,11 @@ class TestSNRNoise:
         im_low_matrix_pf = ifft2c(kspace)
 
         signal_level_low_matrix_pf = np.abs(np.mean(im_low_matrix_pf[mask_low_matrix > 0.1]))
-        assert abs(signal_level_low_matrix - signal_level_low_matrix_pf) / abs(signal_level_low_matrix) < 0.02
+        assert (
+            abs(signal_level_low_matrix - signal_level_low_matrix_pf)
+            / abs(signal_level_low_matrix)
+            < 0.02
+        )
 
     # ---------------------------------------------------------------
     def test_noise_creation(self):
@@ -184,7 +202,9 @@ class TestSNRNoise:
     def test_partial_fourier_filter(self):
         RO, E1 = self.kspace.shape[:2]
 
-        fRO = generate_asymmetric_filter(RO, 0, int(0.8 * RO), filterType="TapperedHanning", width=10)
+        fRO = generate_asymmetric_filter(
+            RO, 0, int(0.8 * RO), filterType="TapperedHanning", width=10
+        )
         fE1 = generate_asymmetric_filter(E1, int(0.2 * E1), E1, filterType="None", width=20)
 
         kspace_filtered = apply_kspace_filter_2D(self.kspace, fRO, fE1)
@@ -200,7 +220,9 @@ class TestSNRNoise:
         RO, E1 = 512, 256
 
         # create some filters
-        pf_fRO = generate_asymmetric_filter(RO, 0, int(0.8 * RO), filterType="TapperedHanning", width=10)
+        pf_fRO = generate_asymmetric_filter(
+            RO, 0, int(0.8 * RO), filterType="TapperedHanning", width=10
+        )
         pf_fE1 = generate_asymmetric_filter(E1, 0, E1 - 1, filterType="TapperedHanning", width=20)
         fRO = generate_symmetric_filter(RO, filterType="Gaussian", sigma=1.23)
         fE1 = generate_symmetric_filter(E1, filterType="Gaussian", sigma=1.45)
@@ -266,7 +288,9 @@ class TestSNRNoise:
         RO, E1 = self.im.shape[:2]
 
         im_low_matrix = apply_matrix_size_reduction_2D(self.im, int(0.8 * RO), int(0.8 * E1))
-        mask_low_matrix = cv2.resize(self.mask, dsize=im_low_matrix.shape[:2], interpolation=cv2.INTER_NEAREST)
+        mask_low_matrix = cv2.resize(
+            self.mask, dsize=im_low_matrix.shape[:2], interpolation=cv2.INTER_NEAREST
+        )
 
         std_map = np.std(np.abs(im_low_matrix), axis=2)
         noise_level = np.mean(std_map[mask_low_matrix > 0.1])
@@ -289,7 +313,11 @@ class TestSNRNoise:
             std_nns_real = np.mean(np.std(np.real(nns), axis=3))
             std_nns_imag = np.mean(np.std(np.imag(nns), axis=3))
 
-            assert abs(std_nns_real - nn_gen.actual_sigma_white_noise_real) / abs(std_nns_real) < 0.02
-            assert abs(std_nns_imag - nn_gen.actual_sigma_white_noise_imag) / abs(std_nns_imag) < 0.02
+            assert (
+                abs(std_nns_real - nn_gen.actual_sigma_white_noise_real) / abs(std_nns_real) < 0.02
+            )
+            assert (
+                abs(std_nns_imag - nn_gen.actual_sigma_white_noise_imag) / abs(std_nns_imag) < 0.02
+            )
 
     # ---------------------------------------------------------------

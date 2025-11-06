@@ -8,7 +8,7 @@ import pytest
 import torch
 from colorama import Fore, Style
 from hydra import compose, initialize
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import OmegaConf
 
 from snraware.components.model import SOAnet
 from snraware.components.setup import end_timer, get_device, set_seed, start_timer
@@ -54,8 +54,6 @@ class TestSOAnet:
         ],
     )
     def test(self, downsample, backbone):
-        from argparse import Namespace
-
         with_timer = True
         device = get_device()
 
@@ -71,7 +69,9 @@ class TestSOAnet:
 
         set_seed(7878756)
 
-        print(f"{Fore.GREEN}-------------> SOAUNet -- {bk} -- {downsample} <----------------------{Style.RESET_ALL}")
+        print(
+            f"{Fore.GREEN}-------------> SOAUNet -- {bk} -- {downsample} <----------------------{Style.RESET_ALL}"
+        )
 
         self.cfg.backbone.block_str = bk
         self.cfg.backbone.num_stages = len(bk)
@@ -97,7 +97,11 @@ class TestSOAnet:
         # np.save(gt_fname, test_out.detach().cpu().numpy())
         assert os.path.exists(gt_fname)
         test_out_gt = np.load(gt_fname)
-        assert np.linalg.norm(test_out_gt - test_out.detach().cpu().numpy()) / np.linalg.norm(test_out_gt) < 2e-3
+        assert (
+            np.linalg.norm(test_out_gt - test_out.detach().cpu().numpy())
+            / np.linalg.norm(test_out_gt)
+            < 2e-3
+        )
 
         del model
         torch.cuda.empty_cache()

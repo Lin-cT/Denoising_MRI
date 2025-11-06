@@ -54,8 +54,6 @@ class TestHRnet:
         ],
     )
     def test(self, backbone):
-        from argparse import Namespace
-
         with_timer = True
         device = get_device()
 
@@ -67,7 +65,9 @@ class TestHRnet:
 
         set_seed(785456)
 
-        print(f"{Fore.GREEN}-------------> HRNet -- {backbone} <----------------------{Style.RESET_ALL}")
+        print(
+            f"{Fore.GREEN}-------------> HRNet -- {backbone} <----------------------{Style.RESET_ALL}"
+        )
 
         self.cfg.backbone.block_str = backbone
         self.config = hydra.utils.instantiate(self.cfg.backbone)
@@ -77,13 +77,19 @@ class TestHRnet:
 
         t0 = start_timer(enable=with_timer)
         test_out = model(test_in)[-1]
-        end_timer(enable=with_timer, t=t0, msg=f"{backbone} - forward pass - test_in {test_in.shape}")
+        end_timer(
+            enable=with_timer, t=t0, msg=f"{backbone} - forward pass - test_in {test_in.shape}"
+        )
 
         gt_fname = os.path.join(self.data_root, f"test_out_{backbone}.npy")
         # np.save(gt_fname, test_out.detach().cpu().numpy())
         assert os.path.exists(gt_fname)
         test_out_gt = np.load(gt_fname)
-        assert np.linalg.norm(test_out_gt - test_out.detach().cpu().numpy()) / np.linalg.norm(test_out_gt) < 2e-3
+        assert (
+            np.linalg.norm(test_out_gt - test_out.detach().cpu().numpy())
+            / np.linalg.norm(test_out_gt)
+            < 2e-3
+        )
 
         loss = torch.nn.MSELoss()
         t0 = start_timer(enable=with_timer)

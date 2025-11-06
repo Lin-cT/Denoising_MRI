@@ -118,7 +118,13 @@ class Local3DAttention(CnnAttentionBase):
                     channel_first=True,
                 )
                 self.value = Conv3DExt(
-                    C_in, C_out, kernel_size=kernel_size, stride=stride, padding=padding, bias=True, channel_first=True
+                    C_in,
+                    C_out,
+                    kernel_size=kernel_size,
+                    stride=stride,
+                    padding=padding,
+                    bias=True,
+                    channel_first=True,
                 )
             else:
                 self.key = Conv2DExt(
@@ -140,23 +146,37 @@ class Local3DAttention(CnnAttentionBase):
                     channel_first=True,
                 )
                 self.value = Conv2DExt(
-                    C_in, C_out, kernel_size=kernel_size, stride=stride, padding=padding, bias=True, channel_first=True
+                    C_in,
+                    C_out,
+                    kernel_size=kernel_size,
+                    stride=stride,
+                    padding=padding,
+                    bias=True,
+                    channel_first=True,
                 )
         elif attention_type == "lin":
             # linear projections
 
             self.key = LinearGrid3DExt(C_in * num_pixel_patch, C_out * num_pixel_patch, bias=True)
-            self.query = LinearGrid3DExt(C_in * num_pixel_patch, C_out * num_pixel_patch, bias=True)
-            self.value = LinearGrid3DExt(C_in * num_pixel_patch, C_out * num_pixel_patch, bias=True)
+            self.query = LinearGrid3DExt(
+                C_in * num_pixel_patch, C_out * num_pixel_patch, bias=True
+            )
+            self.value = LinearGrid3DExt(
+                C_in * num_pixel_patch, C_out * num_pixel_patch, bias=True
+            )
         else:
             raise NotImplementedError(f"Attention type not implemented: {attention_type}")
 
         if self.att_with_relative_position_bias:
             self.define_relative_position_bias_table_3D(
-                num_win_h=self.num_patch[0], num_win_w=self.num_patch[1], num_win_d=self.num_patch[2]
+                num_win_h=self.num_patch[0],
+                num_win_w=self.num_patch[1],
+                num_win_d=self.num_patch[2],
             )
             self.define_relative_position_index_3D(
-                num_win_h=self.num_patch[0], num_win_w=self.num_patch[1], num_win_d=self.num_patch[2]
+                num_win_h=self.num_patch[0],
+                num_win_w=self.num_patch[1],
+                num_win_d=self.num_patch[2],
             )
 
     def attention(self, k, q, v):
@@ -273,7 +293,9 @@ class Local3DAttention(CnnAttentionBase):
     def forward(self, x):
         _B, C, _D, _H, _W = x.size()
 
-        assert C == self.C_in, f"Input channel {C} does not match expected input channel {self.C_in}"
+        assert C == self.C_in, (
+            f"Input channel {C} does not match expected input channel {self.C_in}"
+        )
 
         if self.attention_type == "conv":
             tm = start_timer(enable=self.with_timer)
@@ -343,7 +365,19 @@ class Local3DAttention(CnnAttentionBase):
 
     def grid2im(self, x):
         """Reshape the windows back into the complete image."""
-        _B, num_win_d, num_win_h, num_win_w, num_patch_d, num_patch_h, num_patch_w, pd, ph, pw, _c = x.shape
+        (
+            _B,
+            num_win_d,
+            num_win_h,
+            num_win_w,
+            num_patch_d,
+            num_patch_h,
+            num_patch_w,
+            pd,
+            ph,
+            pw,
+            _c,
+        ) = x.shape
 
         im_view = rearrange(
             x,

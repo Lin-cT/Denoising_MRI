@@ -94,13 +94,31 @@ class SpatialGlobalAttention(CnnAttentionBase):
             # key, query, value projections convolution
             # Wk, Wq, Wv
             self.key = Conv2DExt(
-                C_in, C_out, kernel_size=kernel_size, stride=stride_qk, padding=padding, bias=True, channel_first=False
+                C_in,
+                C_out,
+                kernel_size=kernel_size,
+                stride=stride_qk,
+                padding=padding,
+                bias=True,
+                channel_first=False,
             )
             self.query = Conv2DExt(
-                C_in, C_out, kernel_size=kernel_size, stride=stride_qk, padding=padding, bias=True, channel_first=False
+                C_in,
+                C_out,
+                kernel_size=kernel_size,
+                stride=stride_qk,
+                padding=padding,
+                bias=True,
+                channel_first=False,
             )
             self.value = Conv2DExt(
-                C_in, C_out, kernel_size=kernel_size, stride=stride, padding=padding, bias=True, channel_first=False
+                C_in,
+                C_out,
+                kernel_size=kernel_size,
+                stride=stride,
+                padding=padding,
+                bias=True,
+                channel_first=False,
             )
         elif attention_type == "lin":
             # linear projections
@@ -112,8 +130,12 @@ class SpatialGlobalAttention(CnnAttentionBase):
             raise NotImplementedError(f"Attention type not implemented: {attention_type}")
 
         if self.att_with_relative_position_bias:
-            self.define_relative_position_bias_table(num_win_h=self.num_wind[0], num_win_w=self.num_wind[1])
-            self.define_relative_position_index(num_win_h=self.num_wind[0], num_win_w=self.num_wind[1])
+            self.define_relative_position_bias_table(
+                num_win_h=self.num_wind[0], num_win_w=self.num_wind[1]
+            )
+            self.define_relative_position_index(
+                num_win_h=self.num_wind[0], num_win_w=self.num_wind[1]
+            )
 
     def attention(self, k, q, v):
         B, T, num_patch_h_per_win, num_patch_w_per_win, num_win_h, num_win_w, ph, pw, C = k.shape
@@ -126,13 +148,34 @@ class SpatialGlobalAttention(CnnAttentionBase):
         tm = start_timer(enable=self.with_timer)
         # k, q, v will be [B, T, num_patch_h_per_win*num_patch_w_per_win, self.n_head, num_win_h*num_win_w, hc]
         k = k.reshape(
-            (B, T, num_patch_h_per_win * num_patch_w_per_win, num_win_h * num_win_w, self.n_head, hc)
+            (
+                B,
+                T,
+                num_patch_h_per_win * num_patch_w_per_win,
+                num_win_h * num_win_w,
+                self.n_head,
+                hc,
+            )
         ).transpose(3, 4)
         q = q.reshape(
-            (B, T, num_patch_h_per_win * num_patch_w_per_win, num_win_h * num_win_w, self.n_head, hc)
+            (
+                B,
+                T,
+                num_patch_h_per_win * num_patch_w_per_win,
+                num_win_h * num_win_w,
+                self.n_head,
+                hc,
+            )
         ).transpose(3, 4)
         v = v.reshape(
-            (B, T, num_patch_h_per_win * num_patch_w_per_win, num_win_h * num_win_w, self.n_head, hc_v)
+            (
+                B,
+                T,
+                num_patch_h_per_win * num_patch_w_per_win,
+                num_win_h * num_win_w,
+                self.n_head,
+                hc_v,
+            )
         ).transpose(3, 4)
         end_timer(enable=self.with_timer, t=tm, msg="k, q, v - reshape")
 
@@ -141,7 +184,8 @@ class SpatialGlobalAttention(CnnAttentionBase):
 
             # random permute within a window
             patch_indexes = torch.zeros(
-                [num_win_h * num_win_w, num_patch_h_per_win * num_patch_w_per_win], dtype=torch.long
+                [num_win_h * num_win_w, num_patch_h_per_win * num_patch_w_per_win],
+                dtype=torch.long,
             )
             for w in range(num_win_h * num_win_w):
                 patch_indexes[w, :] = torch.randperm(num_patch_h_per_win * num_patch_w_per_win)
@@ -205,10 +249,34 @@ class SpatialGlobalAttention(CnnAttentionBase):
                 y_restored[:, :, :, w] = y[:, :, reverse_patch_indexes[w, :], w]
 
             y = torch.reshape(
-                y_restored, (B, T, num_patch_h_per_win, num_patch_w_per_win, num_win_h, num_win_w, ph_v, pw_v, C)
+                y_restored,
+                (
+                    B,
+                    T,
+                    num_patch_h_per_win,
+                    num_patch_w_per_win,
+                    num_win_h,
+                    num_win_w,
+                    ph_v,
+                    pw_v,
+                    C,
+                ),
             )
         else:
-            y = torch.reshape(y, (B, T, num_patch_h_per_win, num_patch_w_per_win, num_win_h, num_win_w, ph_v, pw_v, C))
+            y = torch.reshape(
+                y,
+                (
+                    B,
+                    T,
+                    num_patch_h_per_win,
+                    num_patch_w_per_win,
+                    num_win_h,
+                    num_win_w,
+                    ph_v,
+                    pw_v,
+                    C,
+                ),
+            )
         end_timer(enable=self.with_timer, t=tm, msg="y reshape")
 
         tm = start_timer(enable=self.with_timer)
@@ -220,7 +288,9 @@ class SpatialGlobalAttention(CnnAttentionBase):
     def forward(self, x):
         _B, C, _T, _H, _W = x.size()
 
-        assert C == self.C_in, f"Input channel {C} does not match expected input channel {self.C_in}"
+        assert C == self.C_in, (
+            f"Input channel {C} does not match expected input channel {self.C_in}"
+        )
 
         x = torch.permute(x, [0, 2, 1, 3, 4])
 
@@ -232,17 +302,23 @@ class SpatialGlobalAttention(CnnAttentionBase):
             end_timer(enable=self.with_timer, t=tm, msg="compute k, q, v")
 
             tm = start_timer(enable=self.with_timer)
-            k = self.im2grid(k)  # (B, T, num_patch_per_win, num_patch_per_win, num_win_h, num_win_w, Ps, Ps, C)
+            k = self.im2grid(
+                k
+            )  # (B, T, num_patch_per_win, num_patch_per_win, num_win_h, num_win_w, Ps, Ps, C)
             q = self.im2grid(q)
             v = self.im2grid(v)
             end_timer(enable=self.with_timer, t=tm, msg="im2grid")
         else:
             tm = start_timer(enable=self.with_timer)
-            x = self.im2grid(x)  # (B, T, num_patch_per_win, num_patch_per_win, num_win_h, num_win_w, Ps, Ps, C_in)
+            x = self.im2grid(
+                x
+            )  # (B, T, num_patch_per_win, num_patch_per_win, num_win_h, num_win_w, Ps, Ps, C_in)
             end_timer(enable=self.with_timer, t=tm, msg="im2grid")
 
             tm = start_timer(enable=self.with_timer)
-            k = self.key(x)  # (B, T, num_patch_per_win, num_patch_per_win, num_win_h, num_win_w, Ps, Ps, C)
+            k = self.key(
+                x
+            )  # (B, T, num_patch_per_win, num_patch_per_win, num_win_h, num_win_w, Ps, Ps, C)
             q = self.query(x)
             v = self.value(x)
             end_timer(enable=self.with_timer, t=tm, msg="compute k, q, v")

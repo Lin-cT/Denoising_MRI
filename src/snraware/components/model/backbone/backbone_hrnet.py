@@ -76,7 +76,10 @@ class HRnet(BackboneBase):
         self.block_config = config.block_config
         if len(self.block_config) < self.num_resolution_levels:
             self.block_config.extend(
-                [config.block_config[-1] for _i in range(self.num_resolution_levels - len(self.block_config))]
+                [
+                    config.block_config[-1]
+                    for _i in range(self.num_resolution_levels - len(self.block_config))
+                ]
             )
 
         if isinstance(input_feature_channels, list):
@@ -85,7 +88,10 @@ class HRnet(BackboneBase):
             C_in = input_feature_channels
 
         # compute number of windows and patches
-        self.num_wind = [H // config.block.cell.window_size[0], W // config.block.cell.window_size[1]]
+        self.num_wind = [
+            H // config.block.cell.window_size[0],
+            W // config.block.cell.window_size[1],
+        ]
         self.num_patch = [
             config.block.cell.window_size[0] // config.block.cell.patch_size[0],
             config.block.cell.window_size[1] // config.block.cell.patch_size[1],
@@ -93,7 +99,9 @@ class HRnet(BackboneBase):
 
         if len(config.block.cell.window_size) == 3:
             self.num_wind.append(D // config.block.cell.window_size[2])
-            self.num_patch.append(config.block.cell.window_size[2] // config.block.cell.patch_size[2])
+            self.num_patch.append(
+                config.block.cell.window_size[2] // config.block.cell.patch_size[2]
+            )
 
         # dict to store the parameters used for making blocks
         # these values can change from block to block
@@ -184,7 +192,11 @@ class HRnet(BackboneBase):
 
             # define down sample
             self.down_00_11 = DownSample(
-                N=1, C_in=self.C, C_out=2 * self.C, use_interpolation=self.use_interpolation, with_conv=self.with_conv
+                N=1,
+                C_in=self.C,
+                C_out=2 * self.C,
+                use_interpolation=self.use_interpolation,
+                with_conv=self.with_conv,
             )
 
             # define output B1
@@ -252,10 +264,18 @@ class HRnet(BackboneBase):
 
             # define down sample
             self.down_01_12 = DownSample(
-                N=1, C_in=self.C, C_out=2 * self.C, use_interpolation=self.use_interpolation, with_conv=self.with_conv
+                N=1,
+                C_in=self.C,
+                C_out=2 * self.C,
+                use_interpolation=self.use_interpolation,
+                with_conv=self.with_conv,
             )
             self.down_01_22 = DownSample(
-                N=2, C_in=self.C, C_out=4 * self.C, use_interpolation=self.use_interpolation, with_conv=self.with_conv
+                N=2,
+                C_in=self.C,
+                C_out=4 * self.C,
+                use_interpolation=self.use_interpolation,
+                with_conv=self.with_conv,
             )
             self.down_11_22 = DownSample(
                 N=1,
@@ -345,13 +365,25 @@ class HRnet(BackboneBase):
 
             # define down sample
             self.down_02_13 = DownSample(
-                N=1, C_in=self.C, C_out=2 * self.C, use_interpolation=self.use_interpolation, with_conv=self.with_conv
+                N=1,
+                C_in=self.C,
+                C_out=2 * self.C,
+                use_interpolation=self.use_interpolation,
+                with_conv=self.with_conv,
             )
             self.down_02_23 = DownSample(
-                N=2, C_in=self.C, C_out=4 * self.C, use_interpolation=self.use_interpolation, with_conv=self.with_conv
+                N=2,
+                C_in=self.C,
+                C_out=4 * self.C,
+                use_interpolation=self.use_interpolation,
+                with_conv=self.with_conv,
             )
             self.down_02_33 = DownSample(
-                N=3, C_in=self.C, C_out=8 * self.C, use_interpolation=self.use_interpolation, with_conv=self.with_conv
+                N=3,
+                C_in=self.C,
+                C_out=8 * self.C,
+                use_interpolation=self.use_interpolation,
+                with_conv=self.with_conv,
             )
             self.down_12_23 = DownSample(
                 N=1,
@@ -470,16 +502,32 @@ class HRnet(BackboneBase):
 
             # define down sample
             self.down_03_14 = DownSample(
-                N=1, C_in=self.C, C_out=2 * self.C, use_interpolation=self.use_interpolation, with_conv=self.with_conv
+                N=1,
+                C_in=self.C,
+                C_out=2 * self.C,
+                use_interpolation=self.use_interpolation,
+                with_conv=self.with_conv,
             )
             self.down_03_24 = DownSample(
-                N=2, C_in=self.C, C_out=4 * self.C, use_interpolation=self.use_interpolation, with_conv=self.with_conv
+                N=2,
+                C_in=self.C,
+                C_out=4 * self.C,
+                use_interpolation=self.use_interpolation,
+                with_conv=self.with_conv,
             )
             self.down_03_34 = DownSample(
-                N=3, C_in=self.C, C_out=8 * self.C, use_interpolation=self.use_interpolation, with_conv=self.with_conv
+                N=3,
+                C_in=self.C,
+                C_out=8 * self.C,
+                use_interpolation=self.use_interpolation,
+                with_conv=self.with_conv,
             )
             self.down_03_44 = DownSample(
-                N=4, C_in=self.C, C_out=16 * self.C, use_interpolation=self.use_interpolation, with_conv=self.with_conv
+                N=4,
+                C_in=self.C,
+                C_out=16 * self.C,
+                use_interpolation=self.use_interpolation,
+                with_conv=self.with_conv,
             )
 
             self.down_13_24 = DownSample(
@@ -545,19 +593,35 @@ class HRnet(BackboneBase):
         # fusion stage
         if self.num_resolution_levels >= 2:
             self.down_0_1 = DownSample(
-                N=1, C_in=self.C, C_out=2 * self.C, use_interpolation=self.use_interpolation, with_conv=self.with_conv
+                N=1,
+                C_in=self.C,
+                C_out=2 * self.C,
+                use_interpolation=self.use_interpolation,
+                with_conv=self.with_conv,
             )
         if self.num_resolution_levels >= 3:
             self.down_0_2 = DownSample(
-                N=2, C_in=self.C, C_out=4 * self.C, use_interpolation=self.use_interpolation, with_conv=self.with_conv
+                N=2,
+                C_in=self.C,
+                C_out=4 * self.C,
+                use_interpolation=self.use_interpolation,
+                with_conv=self.with_conv,
             )
         if self.num_resolution_levels >= 4:
             self.down_0_3 = DownSample(
-                N=3, C_in=self.C, C_out=8 * self.C, use_interpolation=self.use_interpolation, with_conv=self.with_conv
+                N=3,
+                C_in=self.C,
+                C_out=8 * self.C,
+                use_interpolation=self.use_interpolation,
+                with_conv=self.with_conv,
             )
         if self.num_resolution_levels >= 5:
             self.down_0_4 = DownSample(
-                N=4, C_in=self.C, C_out=16 * self.C, use_interpolation=self.use_interpolation, with_conv=self.with_conv
+                N=4,
+                C_in=self.C,
+                C_out=16 * self.C,
+                use_interpolation=self.use_interpolation,
+                with_conv=self.with_conv,
             )
 
         if self.num_resolution_levels >= 3:
@@ -759,7 +823,11 @@ class HRnet(BackboneBase):
             )
         elif window_sizing_method == "keep_window_size":
             model_config = set_window_patch_sizes_keep_window_size(
-                model_config, [model_config["H"], model_config["W"]], window_sizes, patch_sizes, module_name=block_name
+                model_config,
+                [model_config["H"], model_config["W"]],
+                window_sizes,
+                patch_sizes,
+                module_name=block_name,
             )
         else:  # mixed
             if level == 0:
@@ -862,10 +930,15 @@ class HRnet(BackboneBase):
 
             x_24 = self.B24(x_23 + self.down_13_24(x_13) + self.down_03_24(x_03) + x_22)
 
-            x_34 = self.B34(x_33 + self.down_23_34(x_23) + self.down_13_34(x_13) + self.down_03_34(x_03))
+            x_34 = self.B34(
+                x_33 + self.down_23_34(x_23) + self.down_13_34(x_13) + self.down_03_34(x_03)
+            )
 
             x_44 = self.B44(
-                self.down_33_44(x_33) + self.down_23_44(x_23) + self.down_13_44(x_13) + self.down_03_44(x_03)
+                self.down_33_44(x_33)
+                + self.down_23_44(x_23)
+                + self.down_13_44(x_13)
+                + self.down_03_44(x_03)
             )
 
         if self.num_resolution_levels == 1:
@@ -907,16 +980,48 @@ class HRnet(BackboneBase):
             y_hat_2 = self.output_B2(y_hat_2)
             y_hat_3 = self.output_B3(y_hat_3)
 
-            y_hat = torch.cat((y_hat_0, self.up_1(y_hat_1), self.up_2(y_hat_2), self.up_3(y_hat_3)), dim=1)
+            y_hat = torch.cat(
+                (y_hat_0, self.up_1(y_hat_1), self.up_2(y_hat_2), self.up_3(y_hat_3)), dim=1
+            )
 
             y_level_outputs = [y_hat_0, y_hat_1, y_hat_2, y_hat_3]
 
         if self.num_resolution_levels == 5:
-            y_hat_0 = x_04 + self.up_1_0(x_14) + self.up_2_0(x_24) + self.up_3_0(x_34) + self.up_4_0(x_44)
-            y_hat_1 = self.down_0_1(x_04) + x_14 + self.up_2_1(x_24) + self.up_3_1(x_34) + self.up_4_1(x_44)
-            y_hat_2 = self.down_0_2(x_04) + self.down_1_2(x_14) + x_24 + self.up_3_2(x_34) + self.up_4_2(x_44)
-            y_hat_3 = self.down_0_3(x_04) + self.down_1_3(x_14) + self.down_2_3(x_24) + x_34 + self.up_4_3(x_44)
-            y_hat_4 = self.down_0_4(x_04) + self.down_1_4(x_14) + self.down_2_4(x_24) + self.down_3_4(x_34) + x_44
+            y_hat_0 = (
+                x_04
+                + self.up_1_0(x_14)
+                + self.up_2_0(x_24)
+                + self.up_3_0(x_34)
+                + self.up_4_0(x_44)
+            )
+            y_hat_1 = (
+                self.down_0_1(x_04)
+                + x_14
+                + self.up_2_1(x_24)
+                + self.up_3_1(x_34)
+                + self.up_4_1(x_44)
+            )
+            y_hat_2 = (
+                self.down_0_2(x_04)
+                + self.down_1_2(x_14)
+                + x_24
+                + self.up_3_2(x_34)
+                + self.up_4_2(x_44)
+            )
+            y_hat_3 = (
+                self.down_0_3(x_04)
+                + self.down_1_3(x_14)
+                + self.down_2_3(x_24)
+                + x_34
+                + self.up_4_3(x_44)
+            )
+            y_hat_4 = (
+                self.down_0_4(x_04)
+                + self.down_1_4(x_14)
+                + self.down_2_4(x_24)
+                + self.down_3_4(x_34)
+                + x_44
+            )
 
             y_hat_0 = self.output_B0(y_hat_0)
             y_hat_1 = self.output_B1(y_hat_1)
@@ -925,7 +1030,14 @@ class HRnet(BackboneBase):
             y_hat_4 = self.output_B4(y_hat_4)
 
             y_hat = torch.cat(
-                (y_hat_0, self.up_1(y_hat_1), self.up_2(y_hat_2), self.up_3(y_hat_3), self.up_4(y_hat_4)), dim=1
+                (
+                    y_hat_0,
+                    self.up_1(y_hat_1),
+                    self.up_2(y_hat_2),
+                    self.up_3(y_hat_3),
+                    self.up_4(y_hat_4),
+                ),
+                dim=1,
             )
 
             y_level_outputs = [y_hat_0, y_hat_1, y_hat_2, y_hat_3, y_hat_4]
@@ -933,9 +1045,12 @@ class HRnet(BackboneBase):
         return [*y_level_outputs, y_hat]
 
     def __str__(self):
-        return create_generic_class_str(obj=self, exclusion_list=[nn.Module, OrderedDict, Block, DownSample, UpSample])
+        return create_generic_class_str(
+            obj=self, exclusion_list=[nn.Module, OrderedDict, Block, DownSample, UpSample]
+        )
 
     def get_number_of_output_channels(self):
         return int(
-            self.config.num_of_channels * sum([np.power(2, k) for k in range(self.config.num_resolution_levels)])
+            self.config.num_of_channels
+            * sum([np.power(2, k) for k in range(self.config.num_resolution_levels)])
         )

@@ -55,8 +55,6 @@ class TestUnet:
         ],
     )
     def test(self, backbone):
-        from argparse import Namespace
-
         with_timer = True
         device = get_device()
 
@@ -95,7 +93,11 @@ class TestUnet:
         # np.save(gt_fname, test_out.detach().cpu().numpy())
         assert os.path.exists(gt_fname)
         test_out_gt = np.load(gt_fname)
-        assert np.linalg.norm(test_out_gt - test_out.detach().cpu().numpy()) / np.linalg.norm(test_out_gt) < 2e-3
+        assert (
+            np.linalg.norm(test_out_gt - test_out.detach().cpu().numpy())
+            / np.linalg.norm(test_out_gt)
+            < 2e-3
+        )
 
         del model
         torch.cuda.empty_cache()

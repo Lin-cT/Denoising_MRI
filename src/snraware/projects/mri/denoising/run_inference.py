@@ -8,9 +8,13 @@ import torch
 from colorama import Fore, Style
 from omegaconf import OmegaConf
 
-from snraware.projects.mri.denoising.inference import apply_model
-from snraware.projects.mri.denoising.inference_model import load_lit_model, load_model, load_scripted_model
 from snraware.components.setup import end_timer, start_timer
+from snraware.projects.mri.denoising.inference import apply_model
+from snraware.projects.mri.denoising.inference_model import (
+    load_lit_model,
+    load_model,
+    load_scripted_model,
+)
 
 # -------------------------------------------------------------------------------------------------
 
@@ -37,10 +41,13 @@ def run_inference(
         model, config = load_model(saved_model_path, saved_config_path)
     else:
         model, config = load_lit_model(saved_model_path, saved_config_path)
-    print(f"{Fore.YELLOW}Load in model file - {saved_model_path} - {saved_config_path}{Style.RESET_ALL}")
+    print(
+        f"{Fore.YELLOW}Load in model file - {saved_model_path} - {saved_config_path}{Style.RESET_ALL}"
+    )
 
     if saved_model_path.endswith(".ckpt"):
         from snraware.projects.mri.denoising.lightning_denoising import after_training
+
         config.logging.output_dir = os.path.dirname(saved_model_path)
         after_training(model, config)
 
@@ -80,7 +87,9 @@ def run_inference(
         device=device,
         verbose=True,
     )
-    print(f"{Fore.YELLOW}Inference time {end_timer(t=t0, enable=True, verbose=False) / 1e3:.2f} sec{Style.RESET_ALL}")
+    print(
+        f"{Fore.YELLOW}Inference time {end_timer(t=t0, enable=True, verbose=False) / 1e3:.2f} sec{Style.RESET_ALL}"
+    )
     return output
 
 
@@ -105,9 +114,14 @@ def arg_parser():
         help="scaling factor to adjust model strength; higher scaling means lower strength",
     )
     parser.add_argument(
-        "--saved_model_path", type=str, default=None, help='model path. endswith ".pth" or ".pts" or ".ckpt"'
+        "--saved_model_path",
+        type=str,
+        default=None,
+        help='model path. endswith ".pth" or ".pts" or ".ckpt"',
     )
-    parser.add_argument("--saved_config_path", type=str, default=None, help="model config yaml file.")
+    parser.add_argument(
+        "--saved_config_path", type=str, default=None, help="model config yaml file."
+    )
 
     parser.add_argument("--batch_size", type=int, default=1, help="batch size for inference")
     parser.add_argument(
@@ -118,13 +132,19 @@ def arg_parser():
         help="cutout size for (H, W, T), None means using the config setting",
     )
     parser.add_argument(
-        "--overlap", nargs="+", type=int, default=[16, 16, 8], help="overlap for (H, W, T), (0, 0, 0) means no overlap"
+        "--overlap",
+        nargs="+",
+        type=int,
+        default=[16, 16, 8],
+        help="overlap for (H, W, T), (0, 0, 0) means no overlap",
     )
 
     parser.add_argument("--input_fname", type=str, default="input", help="input file name")
     parser.add_argument("--gmap_fname", type=str, default="gmap", help="gmap input file name")
 
-    parser.add_argument("--no_gmap", action="store_true", help="if set, do not load gmap, but set gmap as all ones")
+    parser.add_argument(
+        "--no_gmap", action="store_true", help="if set, do not load gmap, but set gmap as all ones"
+    )
 
     return parser.parse_args()
 
@@ -144,8 +164,12 @@ def main():
     print(f"{Fore.YELLOW}Find devices - {device}{Style.RESET_ALL}")
 
     assert os.path.exists(args.input_dir), f"input_dir {args.input_dir} does not exist"
-    assert os.path.exists(args.saved_model_path), f"saved_model_path {args.saved_model_path} does not exist"
-    assert os.path.exists(args.saved_config_path), f"saved_config_path {args.saved_config_path} does not exist"
+    assert os.path.exists(args.saved_model_path), (
+        f"saved_model_path {args.saved_model_path} does not exist"
+    )
+    assert os.path.exists(args.saved_config_path), (
+        f"saved_config_path {args.saved_config_path} does not exist"
+    )
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir)
         print(f"{Fore.YELLOW}Create output_dir {args.output_dir}{Style.RESET_ALL}")

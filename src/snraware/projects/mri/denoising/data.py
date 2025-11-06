@@ -28,7 +28,10 @@ import torch
 from colorama import Fore, Style
 from skimage.util import view_as_blocks
 
-from snraware.projects.mri.denoising.utils import deserialize_from_stream, find_files_with_extension
+from snraware.projects.mri.denoising.utils import (
+    deserialize_from_stream,
+    find_files_with_extension,
+)
 from snraware.projects.mri.snr.fftc import fft2c, ifft2c
 from snraware.projects.mri.snr.imaging import adjust_matrix_size, apply_resolution_reduction_2D
 from snraware.projects.mri.snr.noise import NoiseGenerator
@@ -150,7 +153,9 @@ class MRIDenoisingDataset(torch.utils.data.Dataset):
         self.dicom_mode = dicom_mode
 
         self.samples = find_files_with_extension(self.data_dir, ".dat")
-        print(f"{Fore.YELLOW}Found {len(self.samples)} samples from data directory{Style.RESET_ALL}")
+        print(
+            f"{Fore.YELLOW}Found {len(self.samples)} samples from data directory{Style.RESET_ALL}"
+        )
 
         if rng is None:
             self.rng = np.random.Generator(np.random.PCG64(int(time.time())))
@@ -226,7 +231,9 @@ class MRIDenoisingDataset(torch.utils.data.Dataset):
         noise_sigma = np.zeros((self.repetition,), dtype=np.float32)
         noise_sigma_generated = np.zeros((self.repetition,), dtype=np.float32)
         gmap_data = None
-        single_frame_model = (T == 1) or (self.single_frame_mode and self.rng.uniform() < self.single_frame_mode_prob)
+        single_frame_model = (T == 1) or (
+            self.single_frame_mode and self.rng.uniform() < self.single_frame_mode_prob
+        )
         for rep in range(self.repetition):
             # we can sample a different gmap every repetition
             gmap, _picked_ind_gmap = self._load_gmap(gmaps, index_picked=-1)
@@ -234,9 +241,13 @@ class MRIDenoisingDataset(torch.utils.data.Dataset):
             if single_frame_model:
                 gmap_rep = self._pad_data_2D_for_cutout(gmap)
                 if rep == 0:  # only need to get the 2D frame once for all repetitions
-                    data_rep, gmap_rep = self._process_single_frame_mode(self._pad_data_2D_for_cutout(data), gmap_rep)
+                    data_rep, gmap_rep = self._process_single_frame_mode(
+                        self._pad_data_2D_for_cutout(data), gmap_rep
+                    )
                 else:
-                    _, gmap_rep = self._process_single_frame_mode(self._pad_data_2D_for_cutout(data), gmap_rep)
+                    _, gmap_rep = self._process_single_frame_mode(
+                        self._pad_data_2D_for_cutout(data), gmap_rep
+                    )
 
             else:
                 # ensure sample size is still valid for cutout
@@ -263,7 +274,9 @@ class MRIDenoisingDataset(torch.utils.data.Dataset):
             noisy_data = self._add_poisson_noise(clean_data, noisy_data)
 
         if self.dicom_mode:
-            clean_data, noisy_data, gmap_data = self._process_dicom_mode(clean_data, noisy_data, gmap_data)
+            clean_data, noisy_data, gmap_data = self._process_dicom_mode(
+                clean_data, noisy_data, gmap_data
+            )
 
         # ---------------------------------------------------------
         # cut out the patch
@@ -288,7 +301,9 @@ class MRIDenoisingDataset(torch.utils.data.Dataset):
         noisy_data_patch = np.expand_dims(noisy_data_patch, axis=0)
         gmap_patch = np.expand_dims(gmap_patch, axis=0)
 
-        noisy_data = np.concatenate([np.real(noisy_data_patch), np.imag(noisy_data_patch), gmap_patch], axis=0)
+        noisy_data = np.concatenate(
+            [np.real(noisy_data_patch), np.imag(noisy_data_patch), gmap_patch], axis=0
+        )
         clean_data = np.concatenate([np.real(clean_data_patch), np.imag(clean_data_patch)], axis=0)
 
         # ---------------------------------------------------------
@@ -307,15 +322,21 @@ class MRIDenoisingDataset(torch.utils.data.Dataset):
 
     def _pad_data_2D_for_cutout(self, data):
         if data.shape[0] < self.cutout_shape[0]:
-            data = np.pad(data, ((0, self.cutout_shape[0] - data.shape[0]), (0, 0), (0, 0)), "symmetric")
+            data = np.pad(
+                data, ((0, self.cutout_shape[0] - data.shape[0]), (0, 0), (0, 0)), "symmetric"
+            )
         if data.shape[1] < self.cutout_shape[1]:
-            data = np.pad(data, ((0, 0), (0, self.cutout_shape[1] - data.shape[1]), (0, 0)), "symmetric")
+            data = np.pad(
+                data, ((0, 0), (0, self.cutout_shape[1] - data.shape[1]), (0, 0)), "symmetric"
+            )
         return data
 
     def _pad_data_for_cutout(self, data):
         data = self._pad_data_2D_for_cutout(data)
         if data.shape[2] < self.cutout_shape[2]:
-            data = np.pad(data, ((0, 0), (0, 0), (0, self.cutout_shape[2] - data.shape[2])), "symmetric")
+            data = np.pad(
+                data, ((0, 0), (0, 0), (0, self.cutout_shape[2] - data.shape[2])), "symmetric"
+            )
         return data
 
     # ----------------------------------------------------------------
@@ -412,8 +433,12 @@ class MRIDenoisingDataset(torch.utils.data.Dataset):
     # ----------------------------------------------------------------
 
     def _random_reduce_resolution(self, data):
-        ratio_RO = self.readout_resolution_ratio[self.rng.integers(0, len(self.readout_resolution_ratio)).item()]
-        ratio_E1 = self.phase_resolution_ratio[self.rng.integers(0, len(self.phase_resolution_ratio)).item()]
+        ratio_RO = self.readout_resolution_ratio[
+            self.rng.integers(0, len(self.readout_resolution_ratio)).item()
+        ]
+        ratio_E1 = self.phase_resolution_ratio[
+            self.rng.integers(0, len(self.phase_resolution_ratio)).item()
+        ]
 
         data_reduced_resolution, _, _ = apply_resolution_reduction_2D(
             im=data, ratio_RO=ratio_RO, ratio_E1=ratio_E1, snr_scaling=False, norm="backward"
@@ -438,7 +463,9 @@ class MRIDenoisingDataset(torch.utils.data.Dataset):
 
     def _random_partial_fourier(self, data):
         RO, E1 = data.shape[0], data.shape[1]
-        pf_lottery = self.rng.integers(0, 3).item()  # 0, only 1st dim; 1, only 2nd dim; 2, both dim
+        pf_lottery = self.rng.integers(
+            0, 3
+        ).item()  # 0, only 1st dim; 1, only 2nd dim; 2, both dim
         pf_ratio_RO = self.pf_filter_ratio[self.rng.integers(0, len(self.pf_filter_ratio)).item()]
         pf_ratio_E1 = self.pf_filter_ratio[self.rng.integers(0, len(self.pf_filter_ratio)).item()]
 
@@ -533,7 +560,9 @@ class MRIDenoisingDataset(torch.utils.data.Dataset):
 
         if self.add_noise:
             # create noise
-            nn, noise_sigma = self.noise_gen.generate(RO=data.shape[0], E1=data.shape[1], T=data.shape[2], REP=1)
+            nn, noise_sigma = self.noise_gen.generate(
+                RO=data.shape[0], E1=data.shape[1], T=data.shape[2], REP=1
+            )
             noise_sigma_generated = np.std(nn)
 
             # apply gmap

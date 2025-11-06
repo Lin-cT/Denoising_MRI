@@ -205,7 +205,9 @@ class Swin3DAttention(CnnAttentionBase):
             self.shift_size_w = max(self.win_size_w // 2, 1)
             self.shift_size_d = max(self.win_size_d // 2, 1)
 
-        print(f"{Fore.YELLOW}--> Swin, H {H}, W {W}, D {D}, win size {self.window_size}, num_wind {self.num_wind}")
+        print(
+            f"{Fore.YELLOW}--> Swin, H {H}, W {W}, D {D}, win size {self.window_size}, num_wind {self.num_wind}"
+        )
 
         if attention_type == "conv":
             # key, query, value projections convolution
@@ -230,7 +232,13 @@ class Swin3DAttention(CnnAttentionBase):
                     channel_first=True,
                 )
                 self.value = Conv3DExt(
-                    C_in, C_out, kernel_size=kernel_size, stride=stride, padding=padding, bias=True, channel_first=True
+                    C_in,
+                    C_out,
+                    kernel_size=kernel_size,
+                    stride=stride,
+                    padding=padding,
+                    bias=True,
+                    channel_first=True,
                 )
             else:
                 self.key = Conv2DExt(
@@ -252,7 +260,13 @@ class Swin3DAttention(CnnAttentionBase):
                     channel_first=True,
                 )
                 self.value = Conv2DExt(
-                    C_in, C_out, kernel_size=kernel_size, stride=stride, padding=padding, bias=True, channel_first=True
+                    C_in,
+                    C_out,
+                    kernel_size=kernel_size,
+                    stride=stride,
+                    padding=padding,
+                    bias=True,
+                    channel_first=True,
                 )
         elif attention_type == "lin":
             # linear projections
@@ -297,9 +311,15 @@ class Swin3DAttention(CnnAttentionBase):
         _, Dp, Hp, Wp, _ = k.shape
         # cyclic shift
         if any(i > 0 for i in shift_size):
-            shifted_k = torch.roll(k, shifts=(-shift_size[0], -shift_size[1], -shift_size[2]), dims=(1, 2, 3))
-            shifted_q = torch.roll(q, shifts=(-shift_size[0], -shift_size[1], -shift_size[2]), dims=(1, 2, 3))
-            shifted_v = torch.roll(v, shifts=(-shift_size[0], -shift_size[1], -shift_size[2]), dims=(1, 2, 3))
+            shifted_k = torch.roll(
+                k, shifts=(-shift_size[0], -shift_size[1], -shift_size[2]), dims=(1, 2, 3)
+            )
+            shifted_q = torch.roll(
+                q, shifts=(-shift_size[0], -shift_size[1], -shift_size[2]), dims=(1, 2, 3)
+            )
+            shifted_v = torch.roll(
+                v, shifts=(-shift_size[0], -shift_size[1], -shift_size[2]), dims=(1, 2, 3)
+            )
             attn_mask = mask_matrix
         else:
             shifted_k = k
@@ -391,7 +411,9 @@ class Swin3DAttention(CnnAttentionBase):
     def forward(self, x):
         _B, C, D, H, W = x.size()
 
-        assert C == self.C_in, f"Input channel {C} does not match expected input channel {self.C_in}"
+        assert C == self.C_in, (
+            f"Input channel {C} does not match expected input channel {self.C_in}"
+        )
 
         if self.attention_type == "conv":
             tm = start_timer(enable=self.with_timer)

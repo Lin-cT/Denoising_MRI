@@ -7,10 +7,14 @@ import pytest
 import torch
 from hydra import compose, initialize
 
-from snraware.projects.mri.denoising.inference_model import load_lit_model, load_model, load_scripted_model
+from snraware.components.setup import end_timer, start_timer
+from snraware.projects.mri.denoising.inference_model import (
+    load_lit_model,
+    load_model,
+    load_scripted_model,
+)
 from snraware.projects.mri.denoising.run import run_training
 from snraware.projects.mri.denoising.run_inference import apply_model
-from snraware.components.setup import end_timer, start_timer
 
 # -----------------------------------------------------------------
 
@@ -39,11 +43,17 @@ class TestDenoising:
         model_scripted_fname = os.path.join(
             cfg.logging.output_dir, f"model_{cfg.logging.project}_{cfg.logging.run_name}.pts"
         )
-        model_fname = os.path.join(cfg.logging.output_dir, f"model_{cfg.logging.project}_{cfg.logging.run_name}.pth")
-        config_fname = os.path.join(cfg.logging.output_dir, f"config_{cfg.logging.project}_{cfg.logging.run_name}.yaml")
+        model_fname = os.path.join(
+            cfg.logging.output_dir, f"model_{cfg.logging.project}_{cfg.logging.run_name}.pth"
+        )
+        config_fname = os.path.join(
+            cfg.logging.output_dir, f"config_{cfg.logging.project}_{cfg.logging.run_name}.yaml"
+        )
         model_lit_fname = os.path.join(cfg.logging.output_dir, "checkpoints", "last.ckpt")
 
-        assert os.path.exists(model_scripted_fname), f"Expected model file {model_scripted_fname} exists"
+        assert os.path.exists(model_scripted_fname), (
+            f"Expected model file {model_scripted_fname} exists"
+        )
         assert os.path.exists(model_fname), f"Expected model file {model_fname} exists"
         assert os.path.exists(config_fname), f"Expected config file {config_fname} exists"
         assert os.path.exists(model_lit_fname), f"Expected model file {model_lit_fname} exists"
@@ -67,7 +77,9 @@ class TestDenoising:
             device="cuda",
             verbose=False,
         )
-        print(f"Torch model, inference time {end_timer(t=t0, enable=True, verbose=False) / 1e3:.2f} sec")
+        print(
+            f"Torch model, inference time {end_timer(t=t0, enable=True, verbose=False) / 1e3:.2f} sec"
+        )
 
         t0 = start_timer(enable=True)
         denoised_image_scripted = apply_model(
@@ -81,7 +93,9 @@ class TestDenoising:
             device="cuda",
             verbose=False,
         )
-        print(f"Torch scripted model, inference time {end_timer(t=t0, enable=True, verbose=False) / 1e3:.2f} sec")
+        print(
+            f"Torch scripted model, inference time {end_timer(t=t0, enable=True, verbose=False) / 1e3:.2f} sec"
+        )
 
         t0 = start_timer(enable=True)
         denoised_image_lit = apply_model(
@@ -95,7 +109,9 @@ class TestDenoising:
             device="cuda",
             verbose=False,
         )
-        print(f"Lit model, inference time {end_timer(t=t0, enable=True, verbose=False) / 1e3:.2f} sec")
+        print(
+            f"Lit model, inference time {end_timer(t=t0, enable=True, verbose=False) / 1e3:.2f} sec"
+        )
 
         diff = np.linalg.norm(denoised_image - denoised_image_scripted)
         assert diff / np.linalg.norm(denoised_image) < 1e-3
@@ -110,7 +126,9 @@ class TestDenoising:
         if "gpu" not in selected_markers or "slow" not in selected_markers:
             pytest.skip("Skipping because both markers 'gpu' and 'slow' are not set")
 
-        with initialize(version_base=None, config_path="../src/snraware/projects/mri/denoising/configs"):
+        with initialize(
+            version_base=None, config_path="../src/snraware/projects/mri/denoising/configs"
+        ):
             cfg = compose(
                 config_name="config",
                 overrides=[
@@ -134,7 +152,9 @@ class TestDenoising:
         test_res = run_training(cfg)
         test_res = test_res[0]
         assert test_res["test/PSNR"] > 46, f"Expected test PSNR > 46, got {test_res['test/PSNR']}"
-        assert test_res["test/ssim"] < 0.2, f"Expected test ssim loss < 0.2, got {test_res['test/ssim']}"
+        assert test_res["test/ssim"] < 0.2, (
+            f"Expected test ssim loss < 0.2, got {test_res['test/ssim']}"
+        )
 
         self.load_and_test_saved_model(cfg)
 
@@ -147,7 +167,9 @@ class TestDenoising:
         if os.path.exists(self.data_root) is False or os.path.exists(self.test_root) is False:
             pytest.skip("Skipping because test data not found")
 
-        with initialize(version_base=None, config_path="../src/snraware/projects/mri/denoising/configs"):
+        with initialize(
+            version_base=None, config_path="../src/snraware/projects/mri/denoising/configs"
+        ):
             cfg = compose(
                 config_name="config",
                 overrides=[
@@ -170,6 +192,8 @@ class TestDenoising:
             )
 
         test_res = run_training(cfg)
-        assert test_res[0]["test/PSNR"] > 40, f"Expected test PSNR > 40, got {test_res[0]['test/PSNR']}"
+        assert test_res[0]["test/PSNR"] > 40, (
+            f"Expected test PSNR > 40, got {test_res[0]['test/PSNR']}"
+        )
 
         self.load_and_test_saved_model(cfg)

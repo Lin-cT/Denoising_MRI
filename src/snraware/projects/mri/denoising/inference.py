@@ -34,7 +34,9 @@ def image_to_patches(image, cutout=(64, 64, 16), overlap=(16, 16, 8)):
     # padding the image so we have a complete coverup
     # in each dim we pad the left side by overlap
     # and then cover the right side by what remains from the sliding window
-    image_pad = np.pad(image, ((0, 0), (To, -TO % Ts), (Ho, -HO % Hs), (Wo, -WO % Ws)), "symmetric")
+    image_pad = np.pad(
+        image, ((0, 0), (To, -TO % Ts), (Ho, -HO % Hs), (Wo, -WO % Ws)), "symmetric"
+    )
 
     # breaking the image down into patches
     # and remembering the length in each dimension
@@ -50,7 +52,14 @@ def image_to_patches(image, cutout=(64, 64, 16), overlap=(16, 16, 8)):
 
     image_batch = image_patches.reshape(-1, CO, Tc, Hc, Wc)  # shape:(num_patches,C,T,H,W)
 
-    return image_batch, is_2d_mode, (CO, TO, HO, WO), image_patches_shape, image_pad.shape, (Ts, Hs, Ws)
+    return (
+        image_batch,
+        is_2d_mode,
+        (CO, TO, HO, WO),
+        image_patches_shape,
+        image_pad.shape,
+        (Ts, Hs, Ws),
+    )
 
 
 # -------------------------------------------------------------------------------------------------
@@ -100,12 +109,19 @@ def patches_to_image(
     C_out = image_batch_pred.shape[1]
 
     if is_2d_mode:
-        image_batch_pred = np.reshape(image_batch_pred, (Ntme * K * Nrow * Ncol, C_out, 1, H_o, W_o))
+        image_batch_pred = np.reshape(
+            image_batch_pred, (Ntme * K * Nrow * Ncol, C_out, 1, H_o, W_o)
+        )
         Tc = 1
 
     # set the output image shape, consider the upsampling ratio
     image_patches_ot_shape = (K, Ntme, Nrow, Ncol, C_out, Tc, H_o, W_o)
-    image_pad_ot_shape = (C_out, image_pad_shape[1], image_pad_shape[-2] * ratio_H, image_pad_shape[-1] * ratio_W)
+    image_pad_ot_shape = (
+        C_out,
+        image_pad_shape[1],
+        image_pad_shape[-2] * ratio_H,
+        image_pad_shape[-1] * ratio_W,
+    )
 
     # ---------------------------------------------------------------------------------------------
     # setting up the weight matrix
@@ -157,12 +173,12 @@ def patches_to_image(
     for nt in range(Ntme):
         for nr in range(Nrow):
             for nc in range(Ncol):
-                image_wgt[:, Ts * nt : Ts * nt + Tc, Hs * nr : Hs * nr + Hc, Ws * nc : Ws * nc + Wc] += matrix_rep[
-                    0, nt, nr, nc
-                ]
-                image_prd[:, Ts * nt : Ts * nt + Tc, Hs * nr : Hs * nr + Hc, Ws * nc : Ws * nc + Wc] += (
-                    matrix_weight * image_batch_pred[0, nt, nr, nc]
-                )
+                image_wgt[
+                    :, Ts * nt : Ts * nt + Tc, Hs * nr : Hs * nr + Hc, Ws * nc : Ws * nc + Wc
+                ] += matrix_rep[0, nt, nr, nc]
+                image_prd[
+                    :, Ts * nt : Ts * nt + Tc, Hs * nr : Hs * nr + Hc, Ws * nc : Ws * nc + Wc
+                ] += matrix_weight * image_batch_pred[0, nt, nr, nc]
 
     image_prd /= image_wgt
 
@@ -176,7 +192,13 @@ def patches_to_image(
 
 
 def running_inference(
-    model, image, cutout=(64, 64, 16), overlap=(16, 16, 4), batch_size=1, device="cpu", verbose=False
+    model,
+    image,
+    cutout=(64, 64, 16),
+    overlap=(16, 16, 4),
+    batch_size=1,
+    device="cpu",
+    verbose=False,
 ):
     """
     Runs inference by breaking image into overlapping patches
@@ -196,9 +218,14 @@ def running_inference(
     assert cutout > overlap, "cutout should be greater than overlap"
 
     # split input image to patches
-    image_batch, is_2d_mode, image_shape, image_patches_shape, image_pad_shape, sliding_win_shape = image_to_patches(
-        image, cutout=cutout, overlap=overlap
-    )
+    (
+        image_batch,
+        is_2d_mode,
+        image_shape,
+        image_patches_shape,
+        image_pad_shape,
+        sliding_win_shape,
+    ) = image_to_patches(image, cutout=cutout, overlap=overlap)
 
     d_type = image.dtype
     Tc = image_batch.shape[2]
@@ -210,13 +237,16 @@ def running_inference(
     with torch.inference_mode():
         # process every patch, respects the batch setting
         for i in range(0, image_batch.shape[0], batch_size):
-            x_in = torch.from_numpy(image_batch[i : i + batch_size]).to(device=device, dtype=torch.float32)
+            x_in = torch.from_numpy(image_batch[i : i + batch_size]).to(
+                device=device, dtype=torch.float32
+            )
             res = model(x_in)
             res = res.to(torch.float32).cpu().numpy()
 
             if image_batch_pred is None:
                 image_batch_pred = np.empty(
-                    (image_batch.shape[0], res.shape[1], Tc, res.shape[-2], res.shape[-1]), dtype=d_type
+                    (image_batch.shape[0], res.shape[1], Tc, res.shape[-2], res.shape[-1]),
+                    dtype=d_type,
                 )
                 ratio_H = int(res.shape[-2] // x_in.shape[-2])
                 ratio_W = int(res.shape[-1] // x_in.shape[-1])
@@ -289,7 +319,9 @@ def apply_model(
         g = np.transpose(gmap, [2, 0, 1])
 
         if np.iscomplexobj(x):
-            input = np.concatenate((x[np.newaxis, :].real, x[np.newaxis, :].imag, g[np.newaxis, :]), axis=0)
+            input = np.concatenate(
+                (x[np.newaxis, :].real, x[np.newaxis, :].imag, g[np.newaxis, :]), axis=0
+            )
         else:
             input = np.concatenate((x[np.newaxis, :], g[np.newaxis, :]), axis=0)
 

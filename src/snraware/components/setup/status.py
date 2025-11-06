@@ -65,7 +65,10 @@ def end_timer(enable=False, t=None, msg="", verbose=True):
         else:
             duration = time.perf_counter() - t[0]
             if verbose:
-                print(f"{Fore.LIGHTBLUE_EX}{msg} {duration * 1e3} ms ...{Style.RESET_ALL}", flush=True)
+                print(
+                    f"{Fore.LIGHTBLUE_EX}{msg} {duration * 1e3} ms ...{Style.RESET_ALL}",
+                    flush=True,
+                )
             return duration
     else:
         return 0.0
@@ -162,7 +165,14 @@ def model_info(model, config, H, W, D):
             see torchinfo/model_statistics.py for more information.
     """
     c = config
-    col_names = ("num_params", "params_percent", "mult_adds", "input_size", "output_size", "trainable")
+    col_names = (
+        "num_params",
+        "params_percent",
+        "mult_adds",
+        "input_size",
+        "output_size",
+        "trainable",
+    )
     row_settings = ["var_names", "depth"]
     dtypes = [torch.float32]
     model = model.module if config.trainer.ddp else model
@@ -240,7 +250,9 @@ def model_info(model, config, H, W, D):
         device=config.device,
     )
 
-    logging.info(f"{Fore.MAGENTA}{'-' * 40}Summary of backbone component{'-' * 40}{Style.RESET_ALL}")
+    logging.info(
+        f"{Fore.MAGENTA}{'-' * 40}Summary of backbone component{'-' * 40}{Style.RESET_ALL}"
+    )
     logging.info(f"\n{backbone_model_summary!s}")
 
     torch.cuda.empty_cache()
@@ -330,7 +342,9 @@ def create_generic_class_str(obj: object, exclusion_list=None) -> str:
 def get_rank_str(rank, global_rank=-1):
     if rank == 0:
         if global_rank >= 0:
-            return f"{Fore.BLUE}{Back.WHITE}rank {rank}, global_rank {global_rank} {Style.RESET_ALL}"
+            return (
+                f"{Fore.BLUE}{Back.WHITE}rank {rank}, global_rank {global_rank} {Style.RESET_ALL}"
+            )
         else:
             return f"{Fore.BLUE}{Back.WHITE}rank {rank} {Style.RESET_ALL}"
     if rank == 1:
@@ -370,7 +384,9 @@ def get_rank_str(rank, global_rank=-1):
             return f"{Fore.LIGHTCYAN_EX}{Back.WHITE}rank {rank} {Style.RESET_ALL}"
 
     if global_rank >= 0:
-        return f"{Fore.WHITE}{Style.BRIGHT}rank {rank}, global_rank {global_rank} {Style.RESET_ALL}"
+        return (
+            f"{Fore.WHITE}{Style.BRIGHT}rank {rank}, global_rank {global_rank} {Style.RESET_ALL}"
+        )
     else:
         return f"{Fore.WHITE}{Style.BRIGHT}rank {rank} {Style.RESET_ALL}"
 

@@ -157,7 +157,9 @@ def zero_padding_resize_2D(im, dst_RO, dst_E1, snr_scaling=True, norm="ortho"):
         data_padded = np.pad(kspace, [(padding[0], padding[0]), (padding[1], padding[1]), (0, 0)])
 
     if im.ndim == 4:
-        data_padded = np.pad(kspace, [(padding[0], padding[0]), (padding[1], padding[1]), (0, 0), (0, 0)])
+        data_padded = np.pad(
+            kspace, [(padding[0], padding[0]), (padding[1], padding[1]), (0, 0), (0, 0)]
+        )
 
     if snr_scaling is True:
         scaling = np.sqrt(dst_RO * dst_E1) / np.sqrt(RO * E1)

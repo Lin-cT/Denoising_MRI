@@ -70,13 +70,31 @@ class SpatialViTAttention(CnnAttentionBase):
             # key, query, value projections convolution
             # Wk, Wq, Wv
             self.key = Conv2DExt(
-                C_in, C_out, kernel_size=kernel_size, stride=stride_qk, padding=padding, bias=True, channel_first=False
+                C_in,
+                C_out,
+                kernel_size=kernel_size,
+                stride=stride_qk,
+                padding=padding,
+                bias=True,
+                channel_first=False,
             )
             self.query = Conv2DExt(
-                C_in, C_out, kernel_size=kernel_size, stride=stride_qk, padding=padding, bias=True, channel_first=False
+                C_in,
+                C_out,
+                kernel_size=kernel_size,
+                stride=stride_qk,
+                padding=padding,
+                bias=True,
+                channel_first=False,
             )
             self.value = Conv2DExt(
-                C_in, C_out, kernel_size=kernel_size, stride=stride, padding=padding, bias=True, channel_first=False
+                C_in,
+                C_out,
+                kernel_size=kernel_size,
+                stride=stride,
+                padding=padding,
+                bias=True,
+                channel_first=False,
             )
         elif attention_type == "lin":
             # linear projections
@@ -88,8 +106,12 @@ class SpatialViTAttention(CnnAttentionBase):
             raise NotImplementedError(f"Attention type not implemented: {attention_type}")
 
         if self.att_with_relative_position_bias:
-            self.define_relative_position_bias_table(num_win_h=self.num_wind[0], num_win_w=self.num_wind[1])
-            self.define_relative_position_index(num_win_h=self.num_wind[0], num_win_w=self.num_wind[1])
+            self.define_relative_position_bias_table(
+                num_win_h=self.num_wind[0], num_win_w=self.num_wind[1]
+            )
+            self.define_relative_position_index(
+                num_win_h=self.num_wind[0], num_win_w=self.num_wind[1]
+            )
 
     def attention(self, k, q, v):
         B, T, num_win_h, num_win_w, wh, ww, C = k.shape
@@ -156,9 +178,15 @@ class SpatialViTAttention(CnnAttentionBase):
                 "For lin attention_type with relative position bias, input H and W have to be the same as the class declaration."
             )
 
-        assert C == self.C_in, f"Input channel {C} does not match expected input channel {self.C_in}"
-        assert H % self.num_wind[0] == 0, f"Height {H} should be divisible by window num {self.num_wind[0]}"
-        assert W % self.num_wind[1] == 0, f"Width {W} should be divisible by window num {self.num_wind[1]}"
+        assert C == self.C_in, (
+            f"Input channel {C} does not match expected input channel {self.C_in}"
+        )
+        assert H % self.num_wind[0] == 0, (
+            f"Height {H} should be divisible by window num {self.num_wind[0]}"
+        )
+        assert W % self.num_wind[1] == 0, (
+            f"Width {W} should be divisible by window num {self.num_wind[1]}"
+        )
 
         x = torch.permute(x, [0, 2, 1, 3, 4])
 

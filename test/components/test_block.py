@@ -87,7 +87,15 @@ class TestBlock:
             print(f"{Fore.YELLOW}--> {fname}{Style.RESET_ALL}")
 
             block_config = create_block_config(block_str=[block_str], block=self.cfg.block)
-            a_block = Block(block_config=block_config[0], C_in=C, C_out=C_out, H=H, W=W, D=T, config=self.cfg.block)
+            a_block = Block(
+                block_config=block_config[0],
+                C_in=C,
+                C_out=C_out,
+                H=H,
+                W=W,
+                D=T,
+                config=self.cfg.block,
+            )
             a_block.to(device=device)
             test_out = a_block(torch.clone(test_in))
 
@@ -95,7 +103,11 @@ class TestBlock:
             # np.save(gt_fname, test_out.detach().cpu().numpy())
             assert os.path.exists(gt_fname)
             test_out_gt = np.load(gt_fname)
-            assert np.linalg.norm(test_out_gt - test_out.detach().cpu().numpy()) / np.linalg.norm(test_out_gt) < 2e-3
+            assert (
+                np.linalg.norm(test_out_gt - test_out.detach().cpu().numpy())
+                / np.linalg.norm(test_out_gt)
+                < 2e-3
+            )
 
 
 if __name__ == "__main__":

@@ -148,7 +148,13 @@ class Cell_Base(nn.Module):
 
         if C_in != C_out:
             self.input_proj = Conv2DExt(
-                C_in, C_out, kernel_size=kernel_size, stride=stride, padding=padding, bias=True, channel_first=True
+                C_in,
+                C_out,
+                kernel_size=kernel_size,
+                stride=stride,
+                padding=padding,
+                bias=True,
+                channel_first=True,
             )
         else:
             self.input_proj = nn.Identity()
@@ -523,7 +529,9 @@ class Cell(Cell_Base):
             D = self.attn.get_dimension_for_linear_mixer()
             D_prime = int(self.scale_ratio_in_mixer * D)
 
-            self.mlp = nn.Sequential(nn.Linear(D, D_prime, bias=True), act_func, nn.Linear(D_prime, D, bias=True))
+            self.mlp = nn.Sequential(
+                nn.Linear(D, D_prime, bias=True), act_func, nn.Linear(D_prime, D, bias=True)
+            )
         else:
             raise NotImplementedError(f"Mixer mode not implemented: {self.mixer_type}")
 
@@ -693,7 +701,9 @@ class Parallel_Cell(Cell_Base):
             D_out = int(D // self.C_in * self.C_out)
             D_prime = int(self.scale_ratio_in_mixer * D_out)
 
-            self.mlp = nn.Sequential(nn.Linear(D, D_prime, bias=True), act_func, nn.Linear(D_prime, D_out, bias=True))
+            self.mlp = nn.Sequential(
+                nn.Linear(D, D_prime, bias=True), act_func, nn.Linear(D_prime, D_out, bias=True)
+            )
         else:
             raise NotImplementedError(f"Mixer mode not implemented: {self.mixer_type}")
 

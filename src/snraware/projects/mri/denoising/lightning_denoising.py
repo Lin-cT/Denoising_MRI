@@ -11,10 +11,10 @@ from colorama import Fore, Style
 from omegaconf import OmegaConf
 from torch.utils.data import random_split
 
+from snraware.components.optim import OptimScheduler
 from snraware.projects.loss.imaging_loss import PSNR, Combined_Loss
 from snraware.projects.mri.denoising.data import MRIDenoisingDatasetTest
 from snraware.projects.mri.denoising.inference import running_inference
-from snraware.components.optim import OptimScheduler
 
 # -----------------------------------------------------------------
 
@@ -28,7 +28,17 @@ class LitDenoising(L.LightningModule):
         self.scheduler_type = self.model.config.scheduler.name
         self.optim_sched = None
         self.loss_fn = None
-        self.metric_names = ["mse", "l1", "perpendicular", "perceptual", "psnr", "spec", "dwt", "ssim", "ssim3d"]
+        self.metric_names = [
+            "mse",
+            "l1",
+            "perpendicular",
+            "perceptual",
+            "psnr",
+            "spec",
+            "dwt",
+            "ssim",
+            "ssim3d",
+        ]
         self.metrics = None
         self.durations = []
 
@@ -51,12 +61,17 @@ class LitDenoising(L.LightningModule):
             # create loss function
             if self.loss_fn is None:
                 self.loss_fn = Combined_Loss(
-                    losses=self.config.loss, loss_weights=self.config.loss_weights, complex_i=True, device=self.device
+                    losses=self.config.loss,
+                    loss_weights=self.config.loss_weights,
+                    complex_i=True,
+                    device=self.device,
                 )
             # create metrics
             if self.metrics is None:
                 self.metrics = [
-                    Combined_Loss(losses=[n], loss_weights=[1.0], complex_i=True, device=self.device)
+                    Combined_Loss(
+                        losses=[n], loss_weights=[1.0], complex_i=True, device=self.device
+                    )
                     for n in self.metric_names
                 ]
 
@@ -80,7 +95,12 @@ class LitDenoising(L.LightningModule):
             for batch_idx in range(self.config.logging.log_train_batches):
                 noisy, clean, noise_sigma = self._decompose_batch(next(loader_iter))
                 self._save_and_log_batches(
-                    stage="train", noisy=noisy, clean=clean, noise_sigma=noise_sigma, pred=None, batch_idx=batch_idx
+                    stage="train",
+                    noisy=noisy,
+                    clean=clean,
+                    noise_sigma=noise_sigma,
+                    pred=None,
+                    batch_idx=batch_idx,
                 )
 
     def on_train_epoch_start(self):
@@ -135,7 +155,13 @@ class LitDenoising(L.LightningModule):
             )
 
             self.log(
-                "tra/loss", loss, prog_bar=True, on_step=True, on_epoch=True, sync_dist=True, batch_size=self.batch_size
+                "tra/loss",
+                loss,
+                prog_bar=True,
+                on_step=True,
+                on_epoch=True,
+                sync_dist=True,
+                batch_size=self.batch_size,
             )
 
             for i, m in enumerate(self.metrics):
@@ -209,7 +235,12 @@ class LitDenoising(L.LightningModule):
 
             if self.trainer.global_rank == 0:
                 self._save_and_log_batches(
-                    stage="val", noisy=noisy, clean=clean, noise_sigma=noise_sigma, pred=pred, batch_idx=batch_idx
+                    stage="val",
+                    noisy=noisy,
+                    clean=clean,
+                    noise_sigma=noise_sigma,
+                    pred=pred,
+                    batch_idx=batch_idx,
                 )
 
     def test_step(self, batch, batch_idx):
@@ -243,14 +274,21 @@ class LitDenoising(L.LightningModule):
 
         if self.trainer.global_rank == 0:
             self._save_and_log_batches(
-                stage="test", noisy=noisy, clean=clean, noise_sigma=noise_sigma, pred=pred, batch_idx=batch_idx
+                stage="test",
+                noisy=noisy,
+                clean=clean,
+                noise_sigma=noise_sigma,
+                pred=pred,
+                batch_idx=batch_idx,
             )
 
     def configure_optimizers(self):
         total_num_steps = self.trainer.estimated_stepping_batches
         print(f"Total number of steps: {total_num_steps}")
         self.optim_sched = OptimScheduler(self.config, self.model, total_num_steps)
-        return [self.optim_sched.optim], [{"scheduler": self.optim_sched.sched, "interval": "step", "frequency": 1}]
+        return [self.optim_sched.optim], [
+            {"scheduler": self.optim_sched.sched, "interval": "step", "frequency": 1}
+        ]
 
     def configure_gradient_clipping(
         self,
@@ -316,9 +354,15 @@ class LitDenoising(L.LightningModule):
                 noise_sigma=noise_sigma,
                 pred_metrics=pred_metrics,
             )
-            if self.logger is not None and isinstance(self.logger, L.pytorch.loggers.wandb.WandbLogger):
+            if self.logger is not None and isinstance(
+                self.logger, L.pytorch.loggers.wandb.WandbLogger
+            ):
                 self.logger.experiment.log(
-                    {f"{fname}_{batch_idx}": wandb.Video(vid, caption=caption, fps=1, format="gif")}
+                    {
+                        f"{fname}_{batch_idx}": wandb.Video(
+                            vid, caption=caption, fps=1, format="gif"
+                        )
+                    }
                 )
 
 
@@ -451,12 +495,16 @@ def _save_batch_samples_as_video(noisy_im, clean_im, pred_im, gmap, noise_sigma,
             a_vid[:, 2 * W : 3 * W, :] = a_clean_im
 
         gmap_range = np.percentile(gmap[:, :, :, b], [10, 90])
-        caption += f"gmap {gmap_range[0]:.4f}-{gmap_range[1]:.4f}, noise {noise_sigma[b].item():.2f}"
+        caption += (
+            f"gmap {gmap_range[0]:.4f}-{gmap_range[1]:.4f}, noise {noise_sigma[b].item():.2f}"
+        )
         for k, v in pred_metrics.items():
             caption += f", {k} {v[b]:.2f}"
         caption += new_line
 
-        a_vid = np.clip(a_vid, a_min=0.5 * np.median(a_clean_im), a_max=np.percentile(a_clean_im, 90))
+        a_vid = np.clip(
+            a_vid, a_min=0.5 * np.median(a_clean_im), a_max=np.percentile(a_clean_im, 90)
+        )
         temp = np.zeros_like(a_vid)
         vid[:, b * H : (b + 1) * H, :] = np.transpose(
             cv2.normalize(a_vid, temp, 0, 255, norm_type=cv2.NORM_MINMAX), [2, 0, 1]
@@ -498,9 +546,13 @@ def after_training(model, config):
 
     diff = torch.linalg.norm(y - y_scripted)
     if diff / torch.linalg.norm(y) > 1e-3:
-        print(f"{Fore.YELLOW}Saved model gives different inference results - {model_scripted_fname}{Style.RESET_ALL}")
+        print(
+            f"{Fore.YELLOW}Saved model gives different inference results - {model_scripted_fname}{Style.RESET_ALL}"
+        )
     else:
-        print(f"{Fore.GREEN}Saved model is validated for inference - {model_scripted_fname}{Style.RESET_ALL}")
+        print(
+            f"{Fore.GREEN}Saved model is validated for inference - {model_scripted_fname}{Style.RESET_ALL}"
+        )
 
     # further save model in pytorch format
     model_fname = os.path.join(
@@ -510,7 +562,8 @@ def after_training(model, config):
 
     config_yaml = OmegaConf.to_yaml(config, resolve=True)
     config_fname = os.path.join(
-        config.logging.output_dir, f"config_{config.logging.project}_{config.logging.run_name}.yaml"
+        config.logging.output_dir,
+        f"config_{config.logging.project}_{config.logging.run_name}.yaml",
     )
     with open(config_fname, "w") as f:
         f.write(config_yaml)

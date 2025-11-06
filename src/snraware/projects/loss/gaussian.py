@@ -74,7 +74,9 @@ def create_gaussian_window_1d(sigma=1.25, halfwidth=3, voxelsize=1.0, order=1):
 # -------------------------------------------------------------------------------------------------
 
 
-def create_gaussian_window_2d(sigma=(1.25, 1.25), halfwidth=(3, 3), voxelsize=(1.0, 1.0), order=(1, 1)):
+def create_gaussian_window_2d(
+    sigma=(1.25, 1.25), halfwidth=(3, 3), voxelsize=(1.0, 1.0), order=(1, 1)
+):
     """Creates a 2D gaussian kernel."""
     k_0 = compute_gaussian_and_derivatives_1D(sigma[0], halfwidth[0], voxelsize[0])
     k_1 = compute_gaussian_and_derivatives_1D(sigma[1], halfwidth[1], voxelsize[1])

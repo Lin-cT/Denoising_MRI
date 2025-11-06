@@ -68,7 +68,9 @@ class SOAnet(BackboneBase):
 
         if len(self.config.block.cell.window_size) == 3:
             self.num_wind.append(D // self.config.block.cell.window_size[2])
-            self.num_patch.append(self.config.block.cell.window_size[2] // self.config.block.cell.patch_size[2])
+            self.num_patch.append(
+                self.config.block.cell.window_size[2] // self.config.block.cell.patch_size[2]
+            )
 
         model_config = dict()
         model_config["C_in"] = C_in
@@ -169,7 +171,9 @@ class SOAnet(BackboneBase):
         return y_level_outputs
 
     def __str__(self):
-        return create_generic_class_str(obj=self, exclusion_list=[nn.Module, OrderedDict, Block, DownSample, UpSample])
+        return create_generic_class_str(
+            obj=self, exclusion_list=[nn.Module, OrderedDict, Block, DownSample, UpSample]
+        )
 
     def get_number_of_output_channels(self):
         return int(self.config.num_of_channels * np.power(2, self.config.num_stages - 1))

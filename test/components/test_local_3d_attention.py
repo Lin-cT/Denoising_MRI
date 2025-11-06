@@ -1,17 +1,10 @@
 # type: ignore[reportUninitializedInstanceVariable]
-import copy
-import json
 import os
-import shutil
-import subprocess
-import sys
-import time
 from pathlib import Path
 
 import numpy as np
 import pytest
 import torch
-from colorama import Back, Fore, Style
 
 from snraware.components.model.attention import Local3DAttention
 from snraware.components.setup import end_timer, get_device, set_seed, start_timer
@@ -124,12 +117,18 @@ class TestLocal3DAttention:
 
                                 t0 = start_timer(enable=with_timer)
                                 test_out = att(test_in)
-                                end_timer(enable=with_timer, t=t0, msg=f"forward pass - test_in {test_in.shape}")
+                                end_timer(
+                                    enable=with_timer,
+                                    t=t0,
+                                    msg=f"forward pass - test_in {test_in.shape}",
+                                )
 
                                 gt_fname = os.path.join(self.data_root, f"test_out_{fname}.npy")
                                 # np.save(gt_fname, test_out.detach().cpu().numpy())
                                 assert os.path.exists(gt_fname)
-                                test_out_gt = np.load(os.path.join(self.data_root, f"test_out_{fname}.npy"))
+                                test_out_gt = np.load(
+                                    os.path.join(self.data_root, f"test_out_{fname}.npy")
+                                )
                                 test_out_gt = np.transpose(test_out_gt, [0, 2, 1, 3, 4])
                                 assert (
                                     np.linalg.norm(test_out_gt - test_out.detach().cpu().numpy())

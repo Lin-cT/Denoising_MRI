@@ -76,7 +76,9 @@ def set_window_patch_sizes_keep_num_window(kwargs, HW, num_wind, num_patch, modu
 # -------------------------------------------------------------------------------------------------
 
 
-def set_window_patch_sizes_keep_window_size(kwargs, HW, window_size_input, patch_size_input, module_name=None):
+def set_window_patch_sizes_keep_window_size(
+    kwargs, HW, window_size_input, patch_size_input, module_name=None
+):
     """Set window and patch sizes according to image sizes and number of windows and patches."""
     window_size = copy.deepcopy(window_size_input)
     patch_size = copy.deepcopy(patch_size_input)
@@ -141,11 +143,19 @@ class _D2(nn.Module):
 
         if not self.use_interpolation:
             self.stride_conv = Conv2DExt(
-                in_channels=self.C_in, out_channels=self.C_out, kernel_size=[3, 3], stride=[2, 2], padding=[1, 1]
+                in_channels=self.C_in,
+                out_channels=self.C_out,
+                kernel_size=[3, 3],
+                stride=[2, 2],
+                padding=[1, 1],
             )
         elif self.with_conv or (self.C_in != self.C_out):
             self.conv = Conv2DExt(
-                in_channels=self.C_in, out_channels=self.C_out, kernel_size=[1, 1], stride=[1, 1], padding=[0, 0]
+                in_channels=self.C_in,
+                out_channels=self.C_out,
+                kernel_size=[1, 1],
+                stride=[1, 1],
+                padding=[0, 0],
             )
 
     def forward(self, x: Tensor) -> Tensor:
@@ -185,7 +195,11 @@ class _D2_patch_merging(nn.Module):
         self.C_out = C_out if C_out > 0 else C_in
 
         self.conv = Conv2DExt(
-            in_channels=4 * self.C_in, out_channels=self.C_out, kernel_size=[1, 1], stride=[1, 1], padding=[0, 0]
+            in_channels=4 * self.C_in,
+            out_channels=self.C_out,
+            kernel_size=[1, 1],
+            stride=[1, 1],
+            padding=[0, 0],
         )
 
     def forward(self, x: Tensor) -> Tensor:
@@ -313,7 +327,9 @@ class _D2_patch_merging_3D(nn.Module):
 class DownSample(nn.Module):
     """Downsample by x=2^N, by using N D2 layers."""
 
-    def __init__(self, N=2, C_in=16, C_out=-1, use_interpolation=True, with_conv=True, is_3D=False) -> None:
+    def __init__(
+        self, N=2, C_in=16, C_out=-1, use_interpolation=True, with_conv=True, is_3D=False
+    ) -> None:
         super().__init__()
 
         C_out = C_out if C_out > 0 else C_in
@@ -354,7 +370,9 @@ class _U2(nn.Module):
     If with_conv is True, a 1x1 convolution is added after interpolation.
     """
 
-    def __init__(self, C_in=16, C_out=-1, method="linear", with_conv=True, channel_first=False) -> None:
+    def __init__(
+        self, C_in=16, C_out=-1, method="linear", with_conv=True, channel_first=False
+    ) -> None:
         super().__init__()
 
         self.C_in = C_in
@@ -381,7 +399,10 @@ class _U2(nn.Module):
 
         if self.method == "NN":
             y = F.interpolate(
-                x.reshape((B * D1, D2, H, W)), size=(2 * H, 2 * W), mode="nearest", recompute_scale_factor=False
+                x.reshape((B * D1, D2, H, W)),
+                size=(2 * H, 2 * W),
+                mode="nearest",
+                recompute_scale_factor=False,
             )
         elif self.method == "linear":
             y = F.interpolate(
@@ -410,7 +431,9 @@ class _U2_3D(nn.Module):
     If with_conv is True, a 1x1 convolution is added after interpolation.
     """
 
-    def __init__(self, C_in=16, C_out=-1, method="linear", with_conv=True, channel_first=False) -> None:
+    def __init__(
+        self, C_in=16, C_out=-1, method="linear", with_conv=True, channel_first=False
+    ) -> None:
         super().__init__()
 
         self.C_in = C_in
@@ -439,7 +462,12 @@ class _U2_3D(nn.Module):
         _B, _C, T, H, W = x_channel_first.shape
 
         if self.method == "NN":
-            y = F.interpolate(x_channel_first, size=(2 * T, 2 * H, 2 * W), mode="nearest", recompute_scale_factor=False)
+            y = F.interpolate(
+                x_channel_first,
+                size=(2 * T, 2 * H, 2 * W),
+                mode="nearest",
+                recompute_scale_factor=False,
+            )
         elif self.method == "linear":
             y = F.interpolate(
                 x_channel_first,
@@ -468,7 +496,14 @@ class UpSample(nn.Module):
     """Upsample by x(2^N), by using N U2 layers."""
 
     def __init__(
-        self, N=2, C_in=16, C_out=-1, method="linear", with_conv=True, is_3D=False, channel_first=False
+        self,
+        N=2,
+        C_in=16,
+        C_out=-1,
+        method="linear",
+        with_conv=True,
+        is_3D=False,
+        channel_first=False,
     ) -> None:
         super().__init__()
 
@@ -490,7 +525,11 @@ class UpSample(nn.Module):
             (
                 "U2_0",
                 UpSampleLayer(
-                    C_in=C_in, C_out=C_out, method=method, with_conv=with_conv, channel_first=self.channel_first
+                    C_in=C_in,
+                    C_out=C_out,
+                    method=method,
+                    with_conv=with_conv,
+                    channel_first=self.channel_first,
                 ),
             )
         ]
@@ -499,7 +538,11 @@ class UpSample(nn.Module):
                 (
                     f"U2_{n}",
                     UpSampleLayer(
-                        C_in=C_out, C_out=C_out, method=method, with_conv=with_conv, channel_first=self.channel_first
+                        C_in=C_out,
+                        C_out=C_out,
+                        method=method,
+                        with_conv=with_conv,
+                        channel_first=self.channel_first,
                     ),
                 )
             )

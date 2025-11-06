@@ -63,7 +63,12 @@ class SophiaG(Optimizer):
         if not 0.0 <= weight_decay:
             raise ValueError(f"Invalid weight_decay value: {weight_decay}")
         defaults = dict(
-            lr=lr, betas=betas, rho=rho, weight_decay=weight_decay, maximize=maximize, capturable=capturable
+            lr=lr,
+            betas=betas,
+            rho=rho,
+            weight_decay=weight_decay,
+            maximize=maximize,
+            capturable=capturable,
         )
         super().__init__(params, defaults)
 
@@ -181,7 +186,9 @@ def sophiag(
     maximize: bool,
 ):
     if not all(isinstance(t, torch.Tensor) for t in state_steps):
-        raise RuntimeError("API has changed, `state_steps` argument must contain a list of singleton tensors")
+        raise RuntimeError(
+            "API has changed, `state_steps` argument must contain a list of singleton tensors"
+        )
 
     func = _single_tensor_sophiag
 

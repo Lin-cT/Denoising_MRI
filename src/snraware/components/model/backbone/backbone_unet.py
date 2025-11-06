@@ -55,7 +55,12 @@ class _unet_attention(nn.Module):
         )
 
         self.conv_gate = Conv2DExt(
-            in_channels=self.C, out_channels=1, kernel_size=[1, 1], stride=[1, 1], padding=[0, 0], channel_first=False
+            in_channels=self.C,
+            out_channels=1,
+            kernel_size=[1, 1],
+            stride=[1, 1],
+            padding=[0, 0],
+            channel_first=False,
         )
 
     def forward(self, q, x):
@@ -120,13 +125,21 @@ class Unet(BackboneBase):
         self.use_unet_attention = config.use_unet_attention
 
         self.block_config = config.block_config
-        if len(self.block_config) < self.num_resolution_levels + 1:  # num_resolution_levels+1 includes the bridge
+        if (
+            len(self.block_config) < self.num_resolution_levels + 1
+        ):  # num_resolution_levels+1 includes the bridge
             self.block_config.extend(
-                [config.block_config[-1] for _i in range(self.num_resolution_levels + 1 - len(self.block_config))]
+                [
+                    config.block_config[-1]
+                    for _i in range(self.num_resolution_levels + 1 - len(self.block_config))
+                ]
             )
 
         # compute number of windows and patches
-        self.num_wind = [H // config.block.cell.window_size[0], W // config.block.cell.window_size[1]]
+        self.num_wind = [
+            H // config.block.cell.window_size[0],
+            W // config.block.cell.window_size[1],
+        ]
         self.num_patch = [
             config.block.cell.window_size[0] // config.block.cell.patch_size[0],
             config.block.cell.window_size[1] // config.block.cell.patch_size[1],
@@ -134,7 +147,9 @@ class Unet(BackboneBase):
 
         if len(config.block.cell.window_size) == 3:
             self.num_wind.append(D // config.block.cell.window_size[2])
-            self.num_patch.append(config.block.cell.window_size[2] // config.block.cell.patch_size[2])
+            self.num_patch.append(
+                config.block.cell.window_size[2] // config.block.cell.patch_size[2]
+            )
 
         model_config = dict()
         model_config["C_in"] = C_in
@@ -415,7 +430,11 @@ class Unet(BackboneBase):
             model_config["H"] = H // 16
             model_config["W"] = W // 16
             model_config = set_window_patch_sizes_keep_window_size(
-                model_config, [model_config["H"], model_config["W"]], window_sizes[3], patch_sizes[3], module_name="U4"
+                model_config,
+                [model_config["H"], model_config["W"]],
+                window_sizes[3],
+                patch_sizes[3],
+                module_name="U4",
             )
             model_config["block_config"] = self.block_config[4]
             self.U4 = Block(**self.get_block_parameters(model_config))
@@ -436,7 +455,11 @@ class Unet(BackboneBase):
             model_config["H"] = H // 8
             model_config["W"] = W // 8
             model_config = set_window_patch_sizes_keep_window_size(
-                model_config, [model_config["H"], model_config["W"]], window_sizes[2], patch_sizes[2], module_name="U3"
+                model_config,
+                [model_config["H"], model_config["W"]],
+                window_sizes[2],
+                patch_sizes[2],
+                module_name="U3",
             )
             model_config["block_config"] = self.block_config[3]
             self.U3 = Block(**self.get_block_parameters(model_config))
@@ -457,7 +480,11 @@ class Unet(BackboneBase):
             model_config["H"] = H // 4
             model_config["W"] = W // 4
             model_config = set_window_patch_sizes_keep_window_size(
-                model_config, [model_config["H"], model_config["W"]], window_sizes[1], patch_sizes[1], module_name="U2"
+                model_config,
+                [model_config["H"], model_config["W"]],
+                window_sizes[1],
+                patch_sizes[1],
+                module_name="U2",
             )
             model_config["block_config"] = self.block_config[2]
             self.U2 = Block(**self.get_block_parameters(model_config))
@@ -478,7 +505,11 @@ class Unet(BackboneBase):
             model_config["H"] = H // 2
             model_config["W"] = W // 2
             model_config = set_window_patch_sizes_keep_window_size(
-                model_config, [model_config["H"], model_config["W"]], window_sizes[0], patch_sizes[0], module_name="U1"
+                model_config,
+                [model_config["H"], model_config["W"]],
+                window_sizes[0],
+                patch_sizes[0],
+                module_name="U1",
             )
             model_config["block_config"] = self.block_config[1]
             self.U1 = Block(**self.get_block_parameters(model_config))
@@ -499,7 +530,11 @@ class Unet(BackboneBase):
             model_config["H"] = H
             model_config["W"] = W
             model_config = set_window_patch_sizes_keep_window_size(
-                model_config, [model_config["H"], model_config["W"]], window_sizes[0], patch_sizes[0], module_name="U0"
+                model_config,
+                [model_config["H"], model_config["W"]],
+                window_sizes[0],
+                patch_sizes[0],
+                module_name="U0",
             )
             model_config["block_config"] = self.block_config[0]
             self.U0 = Block(**self.get_block_parameters(model_config))
@@ -608,7 +643,8 @@ class Unet(BackboneBase):
 
     def __str__(self):
         return create_generic_class_str(
-            obj=self, exclusion_list=[nn.Module, OrderedDict, Block, DownSample, UpSample, _unet_attention]
+            obj=self,
+            exclusion_list=[nn.Module, OrderedDict, Block, DownSample, UpSample, _unet_attention],
         )
 
     def get_number_of_output_channels(self):

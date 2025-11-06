@@ -13,7 +13,11 @@ from lightning.pytorch.strategies import FSDPStrategy
 from omegaconf import DictConfig, OmegaConf
 
 import snraware
-from snraware.projects.mri.denoising.lightning_denoising import DenoisingDataModule, LitDenoising, after_training
+from snraware.projects.mri.denoising.lightning_denoising import (
+    DenoisingDataModule,
+    LitDenoising,
+    after_training,
+)
 from snraware.projects.mri.denoising.model import DenoisingModel
 
 
@@ -42,15 +46,24 @@ def run_training(config: DictConfig):
     # lightning needs NODE_RANK env variable for multi-node training
     if "NODE_RANK" not in os.environ and "RANK" in os.environ:
         os.environ["NODE_RANK"] = os.environ["RANK"]
-        print(f"{Fore.YELLOW}NODE_RANK set to {os.environ['NODE_RANK']} from RANK{Style.RESET_ALL}", flush=True)
+        print(
+            f"{Fore.YELLOW}NODE_RANK set to {os.environ['NODE_RANK']} from RANK{Style.RESET_ALL}",
+            flush=True,
+        )
         print(f"{Fore.YELLOW}RANK is {os.environ['RANK']}{Style.RESET_ALL}", flush=True)
         print(f"{Fore.YELLOW}NODE_RANK is {os.environ['NODE_RANK']}{Style.RESET_ALL}", flush=True)
     if "MASTER_ADDR" in os.environ:
-        print(f"{Fore.YELLOW}MASTER_ADDR is {os.environ['MASTER_ADDR']}{Style.RESET_ALL}", flush=True)
+        print(
+            f"{Fore.YELLOW}MASTER_ADDR is {os.environ['MASTER_ADDR']}{Style.RESET_ALL}", flush=True
+        )
     if "MASTER_PORT" in os.environ:
-        print(f"{Fore.YELLOW}MASTER_PORT is {os.environ['MASTER_PORT']}{Style.RESET_ALL}", flush=True)
+        print(
+            f"{Fore.YELLOW}MASTER_PORT is {os.environ['MASTER_PORT']}{Style.RESET_ALL}", flush=True
+        )
     if "WORLD_SIZE" in os.environ:
-        print(f"{Fore.YELLOW}WORLD_SIZE is {os.environ['WORLD_SIZE']}{Style.RESET_ALL}", flush=True)
+        print(
+            f"{Fore.YELLOW}WORLD_SIZE is {os.environ['WORLD_SIZE']}{Style.RESET_ALL}", flush=True
+        )
 
     if config.seed is None:
         config.seed = torch.randint(0, 2**32, (1,)).item()
@@ -92,12 +105,19 @@ def run_training(config: DictConfig):
 
     # set up the trainer
     if config.trainer.strategy == "fsdp":
-        policy = {snraware.components.model.backbone.Block, snraware.components.model.backbone.DownSample, snraware.components.model.backbone.UpSample}
+        policy = {
+            snraware.components.model.backbone.Block,
+            snraware.components.model.backbone.DownSample,
+            snraware.components.model.backbone.UpSample,
+        }
         strategy = FSDPStrategy(
             auto_wrap_policy=policy,
             sharding_strategy="HYBRID_SHARD",
             device_mesh=tuple(config.device_mesh),
-            activation_checkpointing_policy={snraware.components.model.backbone.DownSample, snraware.components.model.backbone.UpSample},
+            activation_checkpointing_policy={
+                snraware.components.model.backbone.DownSample,
+                snraware.components.model.backbone.UpSample,
+            },
         )
     else:
         strategy = config.trainer.strategy
@@ -135,7 +155,9 @@ def run_training(config: DictConfig):
         flops = _measure_flops(lit_model, config)
         num_params = sum(p.numel() for p in model.parameters())
         print(f"{Fore.YELLOW}GFLOPs: {flops / 1e9:.2f} GFLOPs{Style.RESET_ALL}", flush=True)
-        print(f"{Fore.YELLOW}Num_Parameters: {num_params / 1e6:.2f} M{Style.RESET_ALL}", flush=True)
+        print(
+            f"{Fore.YELLOW}Num_Parameters: {num_params / 1e6:.2f} M{Style.RESET_ALL}", flush=True
+        )
         if wandb_logger is not None:
             wandb_logger.experiment.summary["GFLOPS"] = flops / 1e9
             wandb_logger.experiment.summary["Num_Parameters_m"] = num_params / 1e6
@@ -150,9 +172,13 @@ def run_training(config: DictConfig):
     # save for use in production environment
     if trainer.global_rank == 0:
         model_scripted_fname, model_fname, config_fname = after_training(model, config)
-        print(f"{Fore.GREEN}Trained model saved, scripted format : {model_scripted_fname}{Style.RESET_ALL}")
+        print(
+            f"{Fore.GREEN}Trained model saved, scripted format : {model_scripted_fname}{Style.RESET_ALL}"
+        )
         print(f"{Fore.GREEN}Trained model saved, torch format    : {model_fname}{Style.RESET_ALL}")
-        print(f"{Fore.GREEN}Trained model saved, config file     : {config_fname}{Style.RESET_ALL}")
+        print(
+            f"{Fore.GREEN}Trained model saved, config file     : {config_fname}{Style.RESET_ALL}"
+        )
     print(f"{Fore.YELLOW}{'---' * 30}{Style.RESET_ALL}")
 
     return test_res

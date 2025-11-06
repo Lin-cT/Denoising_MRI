@@ -145,7 +145,9 @@ class NoiseGenerator:
             noise_sigma (float): the noise level.
         """
         # randomly sample the noise level
-        noise_sigma = (self.max_noise_level - self.min_noise_level) * np.random.random_sample() + self.min_noise_level
+        noise_sigma = (
+            self.max_noise_level - self.min_noise_level
+        ) * np.random.random_sample() + self.min_noise_level
 
         # sample the noise at this level
         nns = sample_complex_noise(noise_sigma, (RO, E1, T, REP), self.rng)
@@ -161,12 +163,18 @@ class NoiseGenerator:
         for i in range(REP):
             # ---------------------------------------------
             # apply resolution reduction
-            ratio_RO = self.readout_resolution_ratio[self.rng.integers(0, len(self.readout_resolution_ratio)).item()]
-            ratio_E1 = self.phase_resolution_ratio[self.rng.integers(0, len(self.phase_resolution_ratio)).item()]
+            ratio_RO = self.readout_resolution_ratio[
+                self.rng.integers(0, len(self.readout_resolution_ratio)).item()
+            ]
+            ratio_E1 = self.phase_resolution_ratio[
+                self.rng.integers(0, len(self.phase_resolution_ratio)).item()
+            ]
 
             # no need to apply snr scaling here, since multiple filters may be applied
             # the precise snr unit will be performed once after applying all filters by counting the number of independent samples
-            nns_rep, fdRO, fdE1 = apply_resolution_reduction_2D(nns[:, :, :, i], ratio_RO, ratio_E1, snr_scaling=False)
+            nns_rep, fdRO, fdE1 = apply_resolution_reduction_2D(
+                nns[:, :, :, i], ratio_RO, ratio_E1, snr_scaling=False
+            )
 
             # ---------------------------------------------
             # compute pf filter
@@ -176,10 +184,14 @@ class NoiseGenerator:
 
             # ---------------------------------------------
             # compute kspace filter
-            ro_filter_sigma = self.kspace_filter_sigma[self.rng.integers(0, len(self.kspace_filter_sigma)).item()]
+            ro_filter_sigma = self.kspace_filter_sigma[
+                self.rng.integers(0, len(self.kspace_filter_sigma)).item()
+            ]
             fRO = generate_symmetric_filter(RO, filterType="Gaussian", sigma=ro_filter_sigma)
 
-            e1_filter_sigma = self.kspace_filter_sigma[self.rng.integers(0, len(self.kspace_filter_sigma)).item()]
+            e1_filter_sigma = self.kspace_filter_sigma[
+                self.rng.integers(0, len(self.kspace_filter_sigma)).item()
+            ]
             fE1 = generate_symmetric_filter(E1, filterType="Gaussian", sigma=e1_filter_sigma)
 
             fT = None
@@ -206,7 +218,9 @@ class NoiseGenerator:
             nns_rep = ifft2c(apply_kspace_filter_2D(fft2c(nns_rep), fROs_used, fE1s_used))
 
             if fT is not None:  # if still need to apply filter along temporal dimension
-                nns_rep = ifft1c(apply_kspace_filter_1D(fft1c(np.transpose(nns_rep, [2, 0, 1])), fT))
+                nns_rep = ifft1c(
+                    apply_kspace_filter_1D(fft1c(np.transpose(nns_rep, [2, 0, 1])), fT)
+                )
                 nns_rep = np.transpose(nns_rep, [1, 2, 0])
 
             nns[:, :, :, i] = nns_rep

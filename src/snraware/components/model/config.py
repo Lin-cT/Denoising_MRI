@@ -197,11 +197,15 @@ def create_block_config(block_str: list[str], block: BlockConfig) -> list[list[C
             elif att_type == "G":
                 if mixer == "3":
                     a_block_config.append(
-                        SpatialGlobal3DConfig(shuffle_in_window=block.cell.spatial_global_3d.shuffle_in_window)
+                        SpatialGlobal3DConfig(
+                            shuffle_in_window=block.cell.spatial_global_3d.shuffle_in_window
+                        )
                     )
                 else:
                     a_block_config.append(
-                        SpatialGlobalConfig(shuffle_in_window=block.cell.spatial_global.shuffle_in_window)
+                        SpatialGlobalConfig(
+                            shuffle_in_window=block.cell.spatial_global.shuffle_in_window
+                        )
                     )
             elif att_type == "T":
                 a_block_config.append(
@@ -252,7 +256,9 @@ class BackboneConfig:
     # block config to store the configuration objects for all cells
     # this field is created from the block_str field in the __post_init__
     block_config: list[list[CellTypeVariant]] = field(
-        default_factory=lambda: [[TemporalAttentionConfig(), SpatialLocalConfig(), SpatialGlobalConfig()]]
+        default_factory=lambda: [
+            [TemporalAttentionConfig(), SpatialLocalConfig(), SpatialGlobalConfig()]
+        ]
     )
 
     # whether to use interpolation in downsample layer; if False, use stride convolution
@@ -272,9 +278,9 @@ class BackboneConfig:
     downsample: bool = True
 
     def __post_init__(self):
-        assert isinstance(self.block_str, list) or isinstance(self.block_str, omegaconf.listconfig.ListConfig), (
-            "block_str must be a list of strings"
-        )
+        assert isinstance(self.block_str, list) or isinstance(
+            self.block_str, omegaconf.listconfig.ListConfig
+        ), "block_str must be a list of strings"
         self.block_config = create_block_config(self.block_str, self.block)
 
 

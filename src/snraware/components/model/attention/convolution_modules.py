@@ -29,7 +29,9 @@ class ConvolutionModule(nn.Module):
         """
         super().__init__()
 
-        assert conv_type == "conv2d" or conv_type == "conv3d", f"Conv type not implemented: {conv_type}"
+        assert conv_type == "conv2d" or conv_type == "conv3d", (
+            f"Conv type not implemented: {conv_type}"
+        )
 
         self.C_in = C_in
         self.C_out = C_out

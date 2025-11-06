@@ -25,7 +25,9 @@ def create_heads(config, component_type, C_in, C_out, H, W, D):
     if component_type == "PreConv2D":
         model = PreConv2D(C=C_in, C_out=C_out, bias=config.heads.PreConv2D.conv_with_bias)
     elif component_type == "PoolLinear":
-        model = PoolLinear(config=config, C=C_in, num_classes=C_out, add_tanh=config.heads.PoolLinear.add_tanh)
+        model = PoolLinear(
+            config=config, C=C_in, num_classes=C_out, add_tanh=config.heads.PoolLinear.add_tanh
+        )
     elif component_type == "SimpleConv2d":
         model = SimpleConv2d(config=config, C=C_in, num_classes=C_out)
 
@@ -54,17 +56,35 @@ class TestModel:
         backbone_C = 32
 
         PreConv2D = create_heads(
-            config=self.config, component_type="PreConv2D", C_in=C_in, C_out=backbone_C, H=H, W=W, D=D
+            config=self.config,
+            component_type="PreConv2D",
+            C_in=C_in,
+            C_out=backbone_C,
+            H=H,
+            W=W,
+            D=D,
         )
 
         num_classes = 10
         PoolLinear = create_heads(
-            config=self.config, component_type="PoolLinear", C_in=backbone_C, C_out=num_classes, H=H, W=W, D=D
+            config=self.config,
+            component_type="PoolLinear",
+            C_in=backbone_C,
+            C_out=num_classes,
+            H=H,
+            W=W,
+            D=D,
         )
 
         num_seg_classes = 4
         SimpleConv2d = create_heads(
-            config=self.config, component_type="SimpleConv2d", C_in=backbone_C, C_out=num_seg_classes, H=H, W=W, D=D
+            config=self.config,
+            component_type="SimpleConv2d",
+            C_in=backbone_C,
+            C_out=num_seg_classes,
+            H=H,
+            W=W,
+            D=D,
         )
 
         input = torch.randn(B, C_in, D, H, W, dtype=torch.float32)
@@ -79,6 +99,7 @@ class TestModel:
 
             y = SimpleConv2d(backbone_output)
             assert y.shape == (B, num_seg_classes, D, H, W)
+
 
 # ---------------------------------------------------------------
 

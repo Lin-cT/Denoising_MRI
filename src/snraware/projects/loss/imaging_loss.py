@@ -28,7 +28,11 @@ import torchvision
 from pytorch_wavelets import DWTForward, DWTInverse
 from torchmetrics.functional.image import structural_similarity_index_measure as ssim_functional
 
-from snraware.projects.loss.gaussian import create_gaussian_window_1d, create_gaussian_window_2d, create_gaussian_window_3d
+from snraware.projects.loss.gaussian import (
+    create_gaussian_window_1d,
+    create_gaussian_window_2d,
+    create_gaussian_window_3d,
+)
 
 __all__ = [
     "PSNR",
@@ -52,7 +56,9 @@ __all__ = [
 # -------------------------------------------------------------------------------------------------
 def _get_magnitude_tensor(outputs, targets, is_complex=True):
     if is_complex:
-        assert targets.shape[1] == 2, f"Complex type requires image to have C=2, given C={targets.shape[1]}"
+        assert targets.shape[1] == 2, (
+            f"Complex type requires image to have C=2, given C={targets.shape[1]}"
+        )
         outputs_mag = torch.sqrt(outputs[:, :1] * outputs[:, :1] + outputs[:, 1:] * outputs[:, 1:])
         targets_mag = torch.sqrt(targets[:, :1] * targets[:, :1] + targets[:, 1:] * targets[:, 1:])
     else:
@@ -92,7 +98,13 @@ class FSIM_Loss:
         if self.data_range is None:
             data_range = torch.max(torch.cat((targets_im, outputs_im), dim=0))
 
-        loss = piq.fsim(outputs_im, targets_im, reduction="none", data_range=data_range, chromatic=self.chromatic)
+        loss = piq.fsim(
+            outputs_im,
+            targets_im,
+            reduction="none",
+            data_range=data_range,
+            chromatic=self.chromatic,
+        )
 
         if weights is not None:
             if weights.ndim == 1:
@@ -100,9 +112,13 @@ class FSIM_Loss:
             elif weights.ndim == 2:
                 weights_used = weights.reshape(B * T)
             else:
-                raise NotImplementedError("Only support 1D(Batch) or 2D(Batch+Time) weights for FSIM_Loss")
+                raise NotImplementedError(
+                    "Only support 1D(Batch) or 2D(Batch+Time) weights for FSIM_Loss"
+                )
 
-            v = torch.sum(weights_used * loss) / (torch.sum(weights_used) + torch.finfo(torch.float32).eps)
+            v = torch.sum(weights_used * loss) / (
+                torch.sum(weights_used) + torch.finfo(torch.float32).eps
+            )
         else:
             v = torch.mean(loss)
 
@@ -142,18 +158,28 @@ class SSIM_Loss:
             elif weights.ndim == 2:
                 weights_used = weights.reshape(B * T)
             else:
-                raise NotImplementedError("Only support 1D(Batch) or 2D(Batch+Time) weights for SSIM_Loss")
+                raise NotImplementedError(
+                    "Only support 1D(Batch) or 2D(Batch+Time) weights for SSIM_Loss"
+                )
 
             v_ssim = torch.sum(
                 weights_used
                 * ssim_functional(
-                    outputs_im, targets_im, gaussian_kernel=False, kernel_size=self.window_size, reduction=None
+                    outputs_im,
+                    targets_im,
+                    gaussian_kernel=False,
+                    kernel_size=self.window_size,
+                    reduction=None,
                 )
             ) / (torch.sum(weights_used) + torch.finfo(torch.float32).eps)
         else:
             v_ssim = torch.mean(
                 ssim_functional(
-                    outputs_im, targets_im, gaussian_kernel=False, kernel_size=self.window_size, reduction=None
+                    outputs_im,
+                    targets_im,
+                    gaussian_kernel=False,
+                    kernel_size=self.window_size,
+                    reduction=None,
                 )
             )
 
@@ -184,13 +210,21 @@ class SSIM3D_Loss(SSIM_Loss):
             v_ssim = torch.sum(
                 weights
                 * ssim_functional(
-                    outputs_im, targets_im, gaussian_kernel=False, kernel_size=self.window_size, reduction=None
+                    outputs_im,
+                    targets_im,
+                    gaussian_kernel=False,
+                    kernel_size=self.window_size,
+                    reduction=None,
                 )
             ) / (torch.sum(weights) + torch.finfo(torch.float32).eps)
         else:
             v_ssim = torch.mean(
                 ssim_functional(
-                    outputs_im, targets_im, gaussian_kernel=False, kernel_size=self.window_size, reduction=None
+                    outputs_im,
+                    targets_im,
+                    gaussian_kernel=False,
+                    kernel_size=self.window_size,
+                    reduction=None,
                 )
             )
 
@@ -235,9 +269,13 @@ class MSSSIM_Loss:
             elif weights.ndim == 2:
                 weights_used = weights.reshape(B * T)
             else:
-                raise NotImplementedError("Only support 1D(Batch) or 2D(Batch+Time) weights for MSSSIM_Loss")
+                raise NotImplementedError(
+                    "Only support 1D(Batch) or 2D(Batch+Time) weights for MSSSIM_Loss"
+                )
 
-            v_ssim = torch.sum(weights_used * v) / (torch.sum(weights_used) + torch.finfo(torch.float32).eps)
+            v_ssim = torch.sum(weights_used * v) / (
+                torch.sum(weights_used) + torch.finfo(torch.float32).eps
+            )
         else:
             v_ssim = torch.mean(v)
 
@@ -265,7 +303,9 @@ class L1_Loss:
         B, C, T, _H, _W = targets.shape
         if self.complex_i:
             assert C == 2, f"Complex type requires image to have C=2, given C={C}"
-            diff_L1 = torch.abs(outputs[:, 0] - targets[:, 0]) + torch.abs(outputs[:, 1] - targets[:, 1])
+            diff_L1 = torch.abs(outputs[:, 0] - targets[:, 0]) + torch.abs(
+                outputs[:, 1] - targets[:, 1]
+            )
         else:
             diff_L1 = torch.abs(outputs - targets)
 
@@ -275,9 +315,13 @@ class L1_Loss:
             elif weights.ndim == 2:
                 weights = weights.reshape(B, T, 1, 1, 1)
             else:
-                raise NotImplementedError("Only support 1D(Batch) or 2D(Batch+Time) weights for L1_Loss")
+                raise NotImplementedError(
+                    "Only support 1D(Batch) or 2D(Batch+Time) weights for L1_Loss"
+                )
 
-            v_l1 = torch.sum(weights * diff_L1) / (torch.sum(weights) + torch.finfo(torch.float32).eps)
+            v_l1 = torch.sum(weights * diff_L1) / (
+                torch.sum(weights) + torch.finfo(torch.float32).eps
+            )
         else:
             v_l1 = torch.sum(diff_L1)
 
@@ -310,7 +354,9 @@ class MSE_Loss:
         B, C, T, _H, _W = targets.shape
         if self.complex_i:
             assert C == 2, f"Complex type requires image to have C=2, given C={C}"
-            diff_mag_square = torch.square(outputs[:, 0] - targets[:, 0]) + torch.square(outputs[:, 1] - targets[:, 1])
+            diff_mag_square = torch.square(outputs[:, 0] - targets[:, 0]) + torch.square(
+                outputs[:, 1] - targets[:, 1]
+            )
         else:
             diff_mag_square = torch.square(outputs - targets)
 
@@ -323,9 +369,13 @@ class MSE_Loss:
             elif weights.ndim == 2:
                 weights = weights.reshape(B, T, 1, 1, 1)
             else:
-                raise NotImplementedError("Only support 1D(Batch) or 2D(Batch+Time) weights for MSE_Loss")
+                raise NotImplementedError(
+                    "Only support 1D(Batch) or 2D(Batch+Time) weights for MSE_Loss"
+                )
 
-            v_l2 = torch.sum(weights * diff_mag_square) / (torch.sum(weights) + torch.finfo(torch.float32).eps)
+            v_l2 = torch.sum(weights * diff_mag_square) / (
+                torch.sum(weights) + torch.finfo(torch.float32).eps
+            )
         else:
             return torch.mean(diff_mag_square)
 
@@ -378,9 +428,13 @@ class PSNR_Loss:
             elif weights.ndim == 2:
                 weights = weights.reshape(B, T, 1, 1, 1)
             else:
-                raise NotImplementedError("Only support 1D(Batch) or 2D(Batch+Time) weights for PSNR_Loss")
+                raise NotImplementedError(
+                    "Only support 1D(Batch) or 2D(Batch+Time) weights for PSNR_Loss"
+                )
 
-            v_l2 = torch.sum(weights * torch.log10(num / den)) / (torch.sum(weights) + torch.finfo(torch.float32).eps)
+            v_l2 = torch.sum(weights * torch.log10(num / den)) / (
+                torch.sum(weights) + torch.finfo(torch.float32).eps
+            )
         else:
             v_l2 = torch.sum(torch.log10(num / den))
 
@@ -421,7 +475,9 @@ def perpendicular_loss_complex(X, Y):
     aligned_mask = (torch.cos(angle) < 0).bool()
 
     final_term = torch.zeros_like(ploss)
-    final_term[aligned_mask] = mag_target[aligned_mask] + (mag_target[aligned_mask] - ploss[aligned_mask])
+    final_term[aligned_mask] = mag_target[aligned_mask] + (
+        mag_target[aligned_mask] - ploss[aligned_mask]
+    )
     final_term[~aligned_mask] = ploss[~aligned_mask]
 
     return final_term
@@ -437,9 +493,13 @@ class Perpendicular_Loss:
         B, C, T, _H, _W = targets.shape
 
         if C == 1:
-            loss = perpendicular_loss_complex(outputs[:, 0] + 1j * outputs[:, 0], targets[:, 0] + 1j * targets[:, 0])
+            loss = perpendicular_loss_complex(
+                outputs[:, 0] + 1j * outputs[:, 0], targets[:, 0] + 1j * targets[:, 0]
+            )
         else:
-            loss = perpendicular_loss_complex(outputs[:, 0] + 1j * outputs[:, 1], targets[:, 0] + 1j * targets[:, 1])
+            loss = perpendicular_loss_complex(
+                outputs[:, 0] + 1j * outputs[:, 1], targets[:, 0] + 1j * targets[:, 1]
+            )
 
         if weights is not None:
             if weights.ndim == 1:
@@ -447,7 +507,9 @@ class Perpendicular_Loss:
             elif weights.ndim == 2:
                 weights = weights.reshape(B, T, 1, 1, 1)
             else:
-                raise NotImplementedError("Only support 1D(Batch) or 2D(Batch+Time) weights for Perpendicular_Loss")
+                raise NotImplementedError(
+                    "Only support 1D(Batch) or 2D(Batch+Time) weights for Perpendicular_Loss"
+                )
 
             v = torch.sum(weights * loss) / (torch.sum(weights) + torch.finfo(torch.float32).eps)
         else:
@@ -481,7 +543,9 @@ class Charbonnier_Loss:
             assert C == 2, f"Complex type requires image to have C=2, given C={C}"
             diff_L1_real = torch.abs(outputs[:, 0] - targets[:, 0])
             diff_L1_imag = torch.abs(outputs[:, 1] - targets[:, 1])
-            loss = torch.sqrt(diff_L1_real * diff_L1_real + diff_L1_imag * diff_L1_imag + self.eps * self.eps)
+            loss = torch.sqrt(
+                diff_L1_real * diff_L1_real + diff_L1_imag * diff_L1_imag + self.eps * self.eps
+            )
         else:
             diff_L1 = torch.abs(outputs - targets)
             loss = torch.sqrt(diff_L1 * diff_L1 + self.eps * self.eps)
@@ -492,7 +556,9 @@ class Charbonnier_Loss:
             elif weights.ndim == 2:
                 weights = weights.reshape(B, T, 1, 1, 1)
             else:
-                raise NotImplementedError("Only support 1D(Batch) or 2D(Batch+Time) weights for L1_Loss")
+                raise NotImplementedError(
+                    "Only support 1D(Batch) or 2D(Batch+Time) weights for L1_Loss"
+                )
 
             v_l1 = torch.sum(weights * loss) / torch.sum(weights)
         else:
@@ -552,8 +618,12 @@ class VGGPerceptualLoss(torch.nn.Module):
             targets_im = targets_im.repeat(1, 3, 1, 1)
 
         if self.resize:
-            outputs_im = self.transform(outputs_im, mode=self.interpolate_mode, size=(224, 224), align_corners=False)
-            targets_im = self.transform(targets_im, mode=self.interpolate_mode, size=(224, 224), align_corners=False)
+            outputs_im = self.transform(
+                outputs_im, mode=self.interpolate_mode, size=(224, 224), align_corners=False
+            )
+            targets_im = self.transform(
+                targets_im, mode=self.interpolate_mode, size=(224, 224), align_corners=False
+            )
 
         outputs_im = outputs_im.to(dtype=torch.float32)
         targets_im = targets_im.to(dtype=torch.float32)
@@ -580,7 +650,9 @@ class VGGPerceptualLoss(torch.nn.Module):
                 weights_used = weights.reshape(B * T)
             else:
                 raise NotImplementedError("Only support 1D(Batch) or 2D(Batch+Time) weights")
-            v_vgg = torch.sum(weights_used * loss) / (torch.sum(weights_used) + torch.finfo(torch.float16).eps)
+            v_vgg = torch.sum(weights_used * loss) / (
+                torch.sum(weights_used) + torch.finfo(torch.float16).eps
+            )
         else:
             v_vgg = torch.mean(loss)
 
@@ -622,9 +694,15 @@ class GaussianDeriv1D_Loss:
 
         loss = 0
         for k_1d in self.kernels:
-            grad_outputs_im = F.conv1d(outputs_im, k_1d, bias=None, stride=1, padding="same", groups=C)
-            grad_targets_im = F.conv1d(targets_im, k_1d, bias=None, stride=1, padding="same", groups=C)
-            loss += torch.mean(torch.abs(grad_outputs_im - grad_targets_im), dim=(1, 2), keepdim=True)
+            grad_outputs_im = F.conv1d(
+                outputs_im, k_1d, bias=None, stride=1, padding="same", groups=C
+            )
+            grad_targets_im = F.conv1d(
+                targets_im, k_1d, bias=None, stride=1, padding="same", groups=C
+            )
+            loss += torch.mean(
+                torch.abs(grad_outputs_im - grad_targets_im), dim=(1, 2), keepdim=True
+            )
 
         loss /= len(self.kernels)
 
@@ -632,9 +710,13 @@ class GaussianDeriv1D_Loss:
             if weights.ndim == 1:
                 weights_used = weights.reshape((B, 1))
             else:
-                raise NotImplementedError("Only support 1D(Batch) weights for GaussianDeriv1D_Loss")
+                raise NotImplementedError(
+                    "Only support 1D(Batch) weights for GaussianDeriv1D_Loss"
+                )
 
-            v = torch.sum(weights_used * loss) / (torch.sum(weights_used) + torch.finfo(torch.float32).eps)
+            v = torch.sum(weights_used * loss) / (
+                torch.sum(weights_used) + torch.finfo(torch.float32).eps
+            )
         else:
             v = torch.mean(loss)
 
@@ -672,7 +754,9 @@ class GaussianDeriv_Loss:
         # compute kernels
         self.kernels = []
         for sigma in sigmas:
-            k_2d = create_gaussian_window_2d(sigma=(sigma, sigma), halfwidth=(3, 3), voxelsize=(1.0, 1.0), order=(1, 1))
+            k_2d = create_gaussian_window_2d(
+                sigma=(sigma, sigma), halfwidth=(3, 3), voxelsize=(1.0, 1.0), order=(1, 1)
+            )
             kx, ky = k_2d.shape
             k_2d = torch.from_numpy(np.reshape(k_2d, (1, 1, kx, ky))).to(torch.float32)
             self.kernels.append(k_2d.to(device=device))
@@ -686,9 +770,15 @@ class GaussianDeriv_Loss:
 
         loss = 0
         for k_2d in self.kernels:
-            grad_outputs_im = F.conv2d(outputs_im, k_2d, bias=None, stride=1, padding="same", groups=C)
-            grad_targets_im = F.conv2d(targets_im, k_2d, bias=None, stride=1, padding="same", groups=C)
-            loss += torch.mean(torch.abs(grad_outputs_im - grad_targets_im), dim=(1, 2, 3), keepdim=True)
+            grad_outputs_im = F.conv2d(
+                outputs_im, k_2d, bias=None, stride=1, padding="same", groups=C
+            )
+            grad_targets_im = F.conv2d(
+                targets_im, k_2d, bias=None, stride=1, padding="same", groups=C
+            )
+            loss += torch.mean(
+                torch.abs(grad_outputs_im - grad_targets_im), dim=(1, 2, 3), keepdim=True
+            )
 
         loss /= len(self.kernels)
 
@@ -698,9 +788,13 @@ class GaussianDeriv_Loss:
             elif weights.ndim == 2:
                 weights_used = weights.reshape(B * T)
             else:
-                raise NotImplementedError("Only support 1D(Batch) or 2D(Batch+Time) weights for GaussianDeriv_Loss")
+                raise NotImplementedError(
+                    "Only support 1D(Batch) or 2D(Batch+Time) weights for GaussianDeriv_Loss"
+                )
 
-            v = torch.sum(weights_used * loss) / (torch.sum(weights_used) + torch.finfo(torch.float32).eps)
+            v = torch.sum(weights_used * loss) / (
+                torch.sum(weights_used) + torch.finfo(torch.float32).eps
+            )
         else:
             v = torch.mean(loss)
 
@@ -745,7 +839,10 @@ class GaussianDeriv3D_Loss:
         self.kernels = []
         for sigma, sigma_T in zip(sigmas, sigmas_T, strict=True):
             k_3d = create_gaussian_window_3d(
-                sigma=(sigma, sigma, sigma_T), halfwidth=(3, 3, 3), voxelsize=(1.0, 1.0, 1.0), order=(1, 1, 1)
+                sigma=(sigma, sigma, sigma_T),
+                halfwidth=(3, 3, 3),
+                voxelsize=(1.0, 1.0, 1.0),
+                order=(1, 1, 1),
             )
             kx, ky, kz = k_3d.shape
             k_3d = torch.from_numpy(np.reshape(k_3d, (1, 1, kx, ky, kz))).to(torch.float32)
@@ -759,15 +856,23 @@ class GaussianDeriv3D_Loss:
 
         loss = 0
         for k_3d in self.kernels:
-            grad_outputs_im = F.conv3d(outputs_im, k_3d, bias=None, stride=1, padding="same", groups=C)
-            grad_targets_im = F.conv3d(targets_im, k_3d, bias=None, stride=1, padding="same", groups=C)
-            loss += torch.mean(torch.abs(grad_outputs_im - grad_targets_im), dim=(1, 2, 3, 4), keepdim=True)
+            grad_outputs_im = F.conv3d(
+                outputs_im, k_3d, bias=None, stride=1, padding="same", groups=C
+            )
+            grad_targets_im = F.conv3d(
+                targets_im, k_3d, bias=None, stride=1, padding="same", groups=C
+            )
+            loss += torch.mean(
+                torch.abs(grad_outputs_im - grad_targets_im), dim=(1, 2, 3, 4), keepdim=True
+            )
 
         loss /= len(self.kernels)
 
         if weights is not None:
             if not weights.ndim == 1:
-                raise NotImplementedError("Only support 1D(Batch) weights for GaussianDeriv3D_Loss")
+                raise NotImplementedError(
+                    "Only support 1D(Batch) weights for GaussianDeriv3D_Loss"
+                )
             v = torch.sum(weights * loss) / (torch.sum(weights) + torch.finfo(torch.float32).eps)
         else:
             v = torch.mean(loss)
@@ -851,8 +956,12 @@ class Spectral_Loss:
         outputs_im = outputs_im.to(device=self.device)
         targets_im = targets_im.to(device=self.device)
 
-        outputs_fft = torch.fft.fftshift(torch.fft.fftn(outputs_im, dim=self.dim, norm="backward"), dim=self.dim)
-        targets_fft = torch.fft.fftshift(torch.fft.fftn(targets_im, dim=self.dim, norm="backward"), dim=self.dim)
+        outputs_fft = torch.fft.fftshift(
+            torch.fft.fftn(outputs_im, dim=self.dim, norm="backward"), dim=self.dim
+        )
+        targets_fft = torch.fft.fftshift(
+            torch.fft.fftn(targets_im, dim=self.dim, norm="backward"), dim=self.dim
+        )
 
         outputs_fft[outputs_fft == 0] = self.eps
         targets_fft[targets_fft == 0] = self.eps
@@ -891,7 +1000,16 @@ class Wavelet_Loss:
     This version performs 2D wavelet transformation on the last two dimensions [-2, -1].
     """
 
-    def __init__(self, J=1, wave="db3", mode="reflect", separable=False, only_h=True, complex_i=False, device="cpu"):
+    def __init__(
+        self,
+        J=1,
+        wave="db3",
+        mode="reflect",
+        separable=False,
+        only_h=True,
+        complex_i=False,
+        device="cpu",
+    ):
         """
         @args:
             - J (int): number of wavelet levels
@@ -932,11 +1050,15 @@ class Wavelet_Loss:
             loss = 0
             for a, b in zip(oh, th, strict=False):
                 v = torch.abs(a - b)
-                loss += torch.sum(weights * v) / (torch.sum(weights) + torch.finfo(torch.float16).eps)
+                loss += torch.sum(weights * v) / (
+                    torch.sum(weights) + torch.finfo(torch.float16).eps
+                )
 
             if not self.only_h:
                 v = torch.mean(torch.abs(ol - tl))
-                loss += torch.sum(weights * v) / (torch.sum(weights) + torch.finfo(torch.float16).eps)
+                loss += torch.sum(weights * v) / (
+                    torch.sum(weights) + torch.finfo(torch.float16).eps
+                )
 
             loss /= targets.numel()
         else:
@@ -1003,16 +1125,27 @@ class Combined_Loss:
         elif loss_name.lower() == "perpendicular":
             loss_f = Perpendicular_Loss()
         elif loss_name.lower() == "msssim":
-            loss_f = MSSSIM_Loss(window_size=3, complex_i=self.complex_i, data_range=256, device=self.device)
+            loss_f = MSSSIM_Loss(
+                window_size=3, complex_i=self.complex_i, data_range=256, device=self.device
+            )
         elif loss_name.lower() == "gaussian":
-            loss_f = GaussianDeriv_Loss(sigmas=[0.25, 0.5, 1.0, 1.5], complex_i=self.complex_i, device=self.device)
+            loss_f = GaussianDeriv_Loss(
+                sigmas=[0.25, 0.5, 1.0, 1.5], complex_i=self.complex_i, device=self.device
+            )
         elif loss_name.lower() == "gaussian3d":
             loss_f = GaussianDeriv3D_Loss(
-                sigmas=[0.25, 0.5, 1.0], sigmas_T=[0.25, 0.5, 0.5], complex_i=self.complex_i, device=self.device
+                sigmas=[0.25, 0.5, 1.0],
+                sigmas_T=[0.25, 0.5, 0.5],
+                complex_i=self.complex_i,
+                device=self.device,
             )
         elif loss_name.lower() == "spec":
             loss_f = Spectral_Loss(
-                dim=[-2, -1], min_bound=5, max_bound=95, complex_i=self.complex_i, device=self.device
+                dim=[-2, -1],
+                min_bound=5,
+                max_bound=95,
+                complex_i=self.complex_i,
+                device=self.device,
             )
         elif loss_name.lower() == "dwt":
             loss_f = Wavelet_Loss(
@@ -1040,5 +1173,6 @@ class Combined_Loss:
                 combined_loss += v
 
         return combined_loss
+
 
 # --------------------------------------------------------------------

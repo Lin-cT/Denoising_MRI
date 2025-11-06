@@ -54,7 +54,9 @@ class TestSpatialLocalAttention:
             C_out=C_out,
         )
 
-        a = spacial_vit.im2grid(test_in)  # b t num_win_h num_win_w num_patch_h num_patch_w patch_size_h patch_size_w c
+        a = spacial_vit.im2grid(
+            test_in
+        )  # b t num_win_h num_win_w num_patch_h num_patch_w patch_size_h patch_size_w c
         b = spacial_vit.grid2im(a)
 
         assert torch.allclose(test_in, b)
@@ -147,13 +149,17 @@ class TestSpatialLocalAttention:
                                 m.to(device=device)
                                 t0 = start_timer(enable=with_timer)
                                 test_out = m(test_in)
-                                end_timer(enable=with_timer, t=t0, msg=f"forward pass - {test_in.shape}")
+                                end_timer(
+                                    enable=with_timer, t=t0, msg=f"forward pass - {test_in.shape}"
+                                )
 
                                 fname = f"{attention_type}_{normalize_Q_K}_{att_with_output_proj}_{cosine_att}_{att_with_relative_position_bias}_{stride_qk}"
                                 gt_fname = os.path.join(self.data_root, f"test_out_{fname}.npy")
                                 # np.save(gt_fname, test_out.detach().cpu().numpy())
                                 assert os.path.exists(gt_fname)
-                                test_out_gt = np.load(os.path.join(self.data_root, f"test_out_{fname}.npy"))
+                                test_out_gt = np.load(
+                                    os.path.join(self.data_root, f"test_out_{fname}.npy")
+                                )
                                 test_out_gt = np.transpose(test_out_gt, [0, 2, 1, 3, 4])
                                 assert (
                                     np.linalg.norm(test_out_gt - test_out.detach().cpu().numpy())
@@ -165,11 +171,17 @@ class TestSpatialLocalAttention:
                                 loss = torch.nn.MSELoss()
                                 mse = loss(test_in, test_out[:, :C])
                                 mse.backward()
-                                end_timer(enable=with_timer, t=t0, msg=f"backward pass - stride_qk {stride_qk}")
+                                end_timer(
+                                    enable=with_timer,
+                                    t=t0,
+                                    msg=f"backward pass - stride_qk {stride_qk}",
+                                )
 
                                 t0 = start_timer(enable=with_timer)
                                 test_out = m(test_in2)
-                                end_timer(enable=with_timer, t=t0, msg=f"forward pass -{test_in2.shape}")
+                                end_timer(
+                                    enable=with_timer, t=t0, msg=f"forward pass -{test_in2.shape}"
+                                )
 
 
 if __name__ == "__main__":

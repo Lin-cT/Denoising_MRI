@@ -9,10 +9,11 @@ from lightning.pytorch.callbacks import ModelCheckpoint, ModelSummary, TQDMProgr
 from omegaconf import OmegaConf
 
 from snraware.components.heads import PreConv2D, SimpleConv2d
-from snraware.components.optim import OptimScheduler
 from snraware.components.model import HRnet, SOAnet, Unet
+from snraware.components.optim import OptimScheduler
 
 # -----------------------------------------------------------------
+
 
 def create_backbone(config, component_type, C_in, H, W, D):
     """
@@ -34,6 +35,7 @@ def create_backbone(config, component_type, C_in, H, W, D):
 
     backbone_C_out = model.get_number_of_output_channels()
     return model, backbone_C_out
+
 
 class SimpleRegressionDataset(torch.utils.data.Dataset):
     def __init__(self, N, C, D, H, W):
@@ -64,7 +66,9 @@ class SimpleRegressionDataModule(L.LightningDataModule):
 
     def setup(self, stage: str):
         if stage == "fit" or stage is None:
-            self.train_set = SimpleRegressionDataset(N=1024, C=self.C, D=self.D, H=self.H, W=self.W)
+            self.train_set = SimpleRegressionDataset(
+                N=1024, C=self.C, D=self.D, H=self.H, W=self.W
+            )
             self.val_set = SimpleRegressionDataset(N=256, C=self.C, D=self.D, H=self.H, W=self.W)
         if stage == "test" or stage is None:
             self.test_set = SimpleRegressionDataset(N=256, C=self.C, D=self.D, H=self.H, W=self.W)
@@ -80,12 +84,18 @@ class SimpleRegressionDataModule(L.LightningDataModule):
 
     def val_dataloader(self):
         return torch.utils.data.DataLoader(
-            self.val_set, batch_size=self.config.batch_size, shuffle=False, num_workers=self.config.num_workers
+            self.val_set,
+            batch_size=self.config.batch_size,
+            shuffle=False,
+            num_workers=self.config.num_workers,
         )
 
     def test_dataloader(self):
         return torch.utils.data.DataLoader(
-            self.test_set, batch_size=self.config.batch_size, shuffle=False, num_workers=self.config.num_workers
+            self.test_set,
+            batch_size=self.config.batch_size,
+            shuffle=False,
+            num_workers=self.config.num_workers,
         )
 
 
@@ -101,7 +111,9 @@ class SimpleRegressionModel(torch.nn.Module):
         backbone_C = config.backbone.num_of_channels
 
         # create a pre head
-        self.pre_head = PreConv2D(C=C_in, C_out=backbone_C, bias=self.config.heads.PreConv2D.conv_with_bias)
+        self.pre_head = PreConv2D(
+            C=C_in, C_out=backbone_C, bias=self.config.heads.PreConv2D.conv_with_bias
+        )
 
         # create the backbone model
         backbone_config = hydra.utils.instantiate(config.backbone)
@@ -136,10 +148,24 @@ class LitSimpleRegression(L.LightningModule):
         outputs = self.model(images)
 
         loss = self.loss_fn(outputs, targets)
-        self.log("train_loss", loss, prog_bar=True, on_step=True, on_epoch=False, batch_size=self.batch_size)
+        self.log(
+            "train_loss",
+            loss,
+            prog_bar=True,
+            on_step=True,
+            on_epoch=False,
+            batch_size=self.batch_size,
+        )
 
         curr_lrs = self.optim_sched.report_lr()
-        self.log("lr", curr_lrs[0][0], prog_bar=True, on_step=True, on_epoch=False, batch_size=self.batch_size)
+        self.log(
+            "lr",
+            curr_lrs[0][0],
+            prog_bar=True,
+            on_step=True,
+            on_epoch=False,
+            batch_size=self.batch_size,
+        )
 
         return loss
 
@@ -147,7 +173,9 @@ class LitSimpleRegression(L.LightningModule):
         images, targets = batch
         outputs = self.model(images)
         mse = self.loss_fn(outputs, targets)
-        self.log("val_mse", mse, prog_bar=True, on_step=False, on_epoch=True, batch_size=self.batch_size)
+        self.log(
+            "val_mse", mse, prog_bar=True, on_step=False, on_epoch=True, batch_size=self.batch_size
+        )
 
     def test_step(self, batch, batch_idx):
         images, targets = batch
@@ -159,7 +187,9 @@ class LitSimpleRegression(L.LightningModule):
         total_num_steps = self.trainer.estimated_stepping_batches
         print(f"Total number of steps: {total_num_steps}")
         self.optim_sched = OptimScheduler(self.config, self.model, total_num_steps)
-        return [self.optim_sched.optim], [{"scheduler": self.optim_sched.sched, "interval": "step", "frequency": 1}]
+        return [self.optim_sched.optim], [
+            {"scheduler": self.optim_sched.sched, "interval": "step", "frequency": 1}
+        ]
 
 
 # -----------------------------------------------------------------
@@ -182,11 +212,11 @@ class TestTrain:
         "backbone",
         ["soanet", "hrnet", "unet"],
     )
-    def test_trainer(self, backbone, request):       
+    def test_trainer(self, backbone, request):
         selected_markers = request.config.getoption("-m")
         if "gpu" not in selected_markers:
             pytest.skip("Skipping because marker 'gpu' is not set")
-            
+
         overrides = [
             f"backbone={backbone}",
             "backbone.block.cell.window_size=[4,4,1]",
@@ -209,7 +239,9 @@ class TestTrain:
         if backbone == "soanet":
             overrides.append("backbone.downsample=false")
 
-        with initialize(version_base=None, config_path="../src/snraware/projects/mri/denoising/configs"):
+        with initialize(
+            version_base=None, config_path="../src/snraware/projects/mri/denoising/configs"
+        ):
             cfg = compose(config_name="config", overrides=overrides)
         self.config = cfg
 
@@ -260,4 +292,6 @@ class TestTrain:
         # test the model
         test_res = trainer.test(model=lit_model, datamodule=data_module, ckpt_path="best")
 
-        assert test_res[0]["test_mse"] < 0.5, "Test MSE is higher than 0.5, indicating poor model performance."
+        assert test_res[0]["test_mse"] < 0.5, (
+            "Test MSE is higher than 0.5, indicating poor model performance."
+        )

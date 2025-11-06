@@ -63,13 +63,13 @@ class TestTemporalAttention:
                         test_out = temporal(test_in)
                         end_timer(enable=with_timer, t=t0, msg=f"forward pass - {test_in.shape}")
 
-                        fname = (
-                            f"TemporalCnnStandardAttention_{normalize_Q_K}_{att_with_output_proj}_{causal}_{stride_qk}"
-                        )
+                        fname = f"TemporalCnnStandardAttention_{normalize_Q_K}_{att_with_output_proj}_{causal}_{stride_qk}"
                         gt_fname = os.path.join(self.data_root, f"test_out_{fname}.npy")
                         # np.save(gt_fname, test_out.detach().cpu().numpy())
                         assert os.path.exists(gt_fname)
-                        test_out_gt = np.load(os.path.join(self.data_root, f"test_out_{fname}.npy"))
+                        test_out_gt = np.load(
+                            os.path.join(self.data_root, f"test_out_{fname}.npy")
+                        )
                         test_out_gt = np.transpose(test_out_gt, [0, 2, 1, 3, 4])
                         # assert np.linalg.norm(test_out_gt - test_out.detach().cpu().numpy())/np.linalg.norm(test_out_gt) < 1e-3
 
@@ -91,15 +91,16 @@ class TestTemporalAttention:
                         test_out = temporal(test_in)
                         end_timer(enable=with_timer, t=t0, msg=f"forward pass - {test_in.shape}")
 
-                        fname = (
-                            f"TemporalChannelCnnAttention_{normalize_Q_K}_{att_with_output_proj}_{causal}_{stride_qk}"
-                        )
+                        fname = f"TemporalChannelCnnAttention_{normalize_Q_K}_{att_with_output_proj}_{causal}_{stride_qk}"
                         gt_fname = os.path.join(self.data_root, f"test_out_{fname}.npy")
                         # np.save(gt_fname, test_out.detach().cpu().numpy())
                         assert os.path.exists(gt_fname)
-                        test_out_gt = np.load(os.path.join(self.data_root, f"test_out_{fname}.npy"))
+                        test_out_gt = np.load(
+                            os.path.join(self.data_root, f"test_out_{fname}.npy")
+                        )
                         assert (
-                            np.linalg.norm(test_out_gt - test_out.detach().cpu().numpy()) / np.linalg.norm(test_out_gt)
+                            np.linalg.norm(test_out_gt - test_out.detach().cpu().numpy())
+                            / np.linalg.norm(test_out_gt)
                             < 1e-3
                         )
 

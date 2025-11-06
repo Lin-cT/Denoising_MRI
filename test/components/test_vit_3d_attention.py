@@ -118,12 +118,18 @@ class TestViT3D:
 
                                 t0 = start_timer(enable=with_timer)
                                 test_out = spacial_vit(test_in)
-                                end_timer(enable=with_timer, t=t0, msg=f"forward pass - stride_qk {stride_qk}")
+                                end_timer(
+                                    enable=with_timer,
+                                    t=t0,
+                                    msg=f"forward pass - stride_qk {stride_qk}",
+                                )
 
                                 fname = f"{attention_type}_{normalize_Q_K}_{att_with_output_proj}_{cosine_att}_{att_with_relative_position_bias}_{stride_qk}"
                                 gt_fname = os.path.join(self.data_root, f"test_out_{fname}.npy")
                                 assert os.path.exists(gt_fname)
-                                test_out_gt = np.load(os.path.join(self.data_root, f"test_out_{fname}.npy"))
+                                test_out_gt = np.load(
+                                    os.path.join(self.data_root, f"test_out_{fname}.npy")
+                                )
                                 test_out_gt = np.transpose(test_out_gt, [0, 2, 1, 3, 4])
                                 assert (
                                     np.linalg.norm(test_out_gt - test_out.detach().cpu().numpy())
@@ -132,13 +138,19 @@ class TestViT3D:
                                 )
 
                                 Bo, Co, To, Ho, Wo = test_out.shape
-                                assert B == Bo and T == To and Co == C_out and H1 == Ho and W1 == Wo
+                                assert (
+                                    B == Bo and T == To and Co == C_out and H1 == Ho and W1 == Wo
+                                )
 
                                 loss = torch.nn.MSELoss()
                                 t0 = start_timer(enable=with_timer)
                                 mse = loss(test_in, test_out[:, :C])
                                 mse.backward()
-                                end_timer(enable=with_timer, t=t0, msg=f"backward pass - stride_qk {stride_qk}")
+                                end_timer(
+                                    enable=with_timer,
+                                    t=t0,
+                                    msg=f"backward pass - stride_qk {stride_qk}",
+                                )
 
                                 print(f"attention_type is {attention_type}, mse is {mse.item()}")
 
@@ -146,7 +158,13 @@ class TestViT3D:
                                     test_out = spacial_vit(test_in2)
 
                                     Bo, Co, To, Ho, Wo = test_out.shape
-                                    assert B == Bo and T == To and Co == C_out and H2 == Ho and W2 == Wo
+                                    assert (
+                                        B == Bo
+                                        and T == To
+                                        and Co == C_out
+                                        and H2 == Ho
+                                        and W2 == Wo
+                                    )
 
         print("Passed ViT3DAttention tests")
 

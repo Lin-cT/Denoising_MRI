@@ -227,8 +227,12 @@ def apply_image_filter_2D(data, sigma_RO=1.25, sigma_E1=1.25):
     Returns:
         ndarray: The filtered image data.
     """
-    fRO = generate_symmetric_filter(data.shape[0], filterType="Gaussian", sigma=sigma_RO, snr_scaling=False)
-    fE1 = generate_symmetric_filter(data.shape[1], filterType="Gaussian", sigma=sigma_E1, snr_scaling=False)
+    fRO = generate_symmetric_filter(
+        data.shape[0], filterType="Gaussian", sigma=sigma_RO, snr_scaling=False
+    )
+    fE1 = generate_symmetric_filter(
+        data.shape[1], filterType="Gaussian", sigma=sigma_E1, snr_scaling=False
+    )
     data_filtered = ifft2c(apply_kspace_filter_2D(fft2c(data), fRO, fE1))
     return data_filtered, fRO, fE1
 
@@ -247,7 +251,9 @@ def apply_image_filter_T(data, sigma_T=1.25):
     Returns:
         ndarray: The filtered image data.
     """
-    fT = generate_symmetric_filter(data.shape[2], filterType="Gaussian", sigma=sigma_T, snr_scaling=False)
+    fT = generate_symmetric_filter(
+        data.shape[2], filterType="Gaussian", sigma=sigma_T, snr_scaling=False
+    )
 
     im = np.transpose(data, (2, 0, 1))
     im = ifft1c(apply_kspace_filter_1D(fft1c(im), fT))

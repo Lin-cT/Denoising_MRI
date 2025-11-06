@@ -360,26 +360,36 @@ def _get_relative_position_bias_tensor(
     relative_position_bias_table: torch.Tensor, relative_position_index: torch.Tensor, N: int
 ) -> torch.Tensor:
     """From pytorch source code."""
-    relative_position_bias = relative_position_bias_table[relative_position_index[:N, :N].reshape(-1)]
+    relative_position_bias = relative_position_bias_table[
+        relative_position_index[:N, :N].reshape(-1)
+    ]
     relative_position_bias = torch.reshape(relative_position_bias, (N, N, -1))
     relative_position_bias = relative_position_bias.permute(2, 0, 1).contiguous()
     return relative_position_bias.unsqueeze(0)
 
 
 def _get_relative_position_bias(
-    relative_position_bias_table: torch.Tensor, relative_position_index: torch.Tensor, window_size: tuple[int]
+    relative_position_bias_table: torch.Tensor,
+    relative_position_index: torch.Tensor,
+    window_size: tuple[int],
 ) -> torch.Tensor:
     """From pytorch source code."""
     N = window_size[0] * window_size[1]
-    return _get_relative_position_bias_tensor(relative_position_bias_table, relative_position_index, N)
+    return _get_relative_position_bias_tensor(
+        relative_position_bias_table, relative_position_index, N
+    )
 
 
 def _get_relative_position_bias_3D(
-    relative_position_bias_table: torch.Tensor, relative_position_index: torch.Tensor, window_size: tuple[int]
+    relative_position_bias_table: torch.Tensor,
+    relative_position_index: torch.Tensor,
+    window_size: tuple[int],
 ) -> torch.Tensor:
     """From pytorch source code."""
     N = window_size[0] * window_size[1] * window_size[2]
-    return _get_relative_position_bias_tensor(relative_position_bias_table, relative_position_index, N)
+    return _get_relative_position_bias_tensor(
+        relative_position_bias_table, relative_position_index, N
+    )
 
 
 # -------------------------------------------------------------------------------------------------
@@ -400,8 +410,12 @@ def normalize_qk(q, k):
     If cosine attention is used, normalization is not applied.
     """
     eps = torch.finfo(k.dtype).eps
-    k = (k - torch.mean(k, dim=-1, keepdim=True)) / (torch.sqrt(torch.var(k, dim=-1, keepdim=True) + eps))
-    q = (q - torch.mean(q, dim=-1, keepdim=True)) / (torch.sqrt(torch.var(q, dim=-1, keepdim=True) + eps))
+    k = (k - torch.mean(k, dim=-1, keepdim=True)) / (
+        torch.sqrt(torch.var(k, dim=-1, keepdim=True) + eps)
+    )
+    q = (q - torch.mean(q, dim=-1, keepdim=True)) / (
+        torch.sqrt(torch.var(q, dim=-1, keepdim=True) + eps)
+    )
     return q, k
 
 
@@ -471,11 +485,23 @@ class CnnAttentionBase(nn.Module):
         if att_with_output_proj:
             if self.D > 1:
                 self.output_proj = Conv3DExt(
-                    C_out, C_out, kernel_size=kernel_size, stride=stride, padding=padding, bias=True, channel_first=True
+                    C_out,
+                    C_out,
+                    kernel_size=kernel_size,
+                    stride=stride,
+                    padding=padding,
+                    bias=True,
+                    channel_first=True,
                 )
             else:
                 self.output_proj = Conv2DExt(
-                    C_out, C_out, kernel_size=kernel_size, stride=stride, padding=padding, bias=True, channel_first=True
+                    C_out,
+                    C_out,
+                    kernel_size=kernel_size,
+                    stride=stride,
+                    padding=padding,
+                    bias=True,
+                    channel_first=True,
                 )
         else:
             self.output_proj = nn.Identity()
@@ -495,16 +521,32 @@ class CnnAttentionBase(nn.Module):
             softmax_scale = 1
         elif self.normalize_Q_K:
             eps = torch.finfo(k.dtype).eps
-            k = (k - torch.mean(k, dim=-1, keepdim=True)) / (torch.sqrt(torch.var(k, dim=-1, keepdim=True) + eps))
-            q = (q - torch.mean(q, dim=-1, keepdim=True)) / (torch.sqrt(torch.var(q, dim=-1, keepdim=True) + eps))
+            k = (k - torch.mean(k, dim=-1, keepdim=True)) / (
+                torch.sqrt(torch.var(k, dim=-1, keepdim=True) + eps)
+            )
+            q = (q - torch.mean(q, dim=-1, keepdim=True)) / (
+                torch.sqrt(torch.var(q, dim=-1, keepdim=True) + eps)
+            )
 
         if self.training:
             y = F.scaled_dot_product_attention(
-                q, k, v, attn_mask=None, dropout_p=self.att_dropout_p, is_causal=self.is_causal, scale=softmax_scale
+                q,
+                k,
+                v,
+                attn_mask=None,
+                dropout_p=self.att_dropout_p,
+                is_causal=self.is_causal,
+                scale=softmax_scale,
             )
         else:
             y = F.scaled_dot_product_attention(
-                q, k, v, attn_mask=None, dropout_p=0.0, is_causal=self.is_causal, scale=softmax_scale
+                q,
+                k,
+                v,
+                attn_mask=None,
+                dropout_p=0.0,
+                is_causal=self.is_causal,
+                scale=softmax_scale,
             )
 
         return y
@@ -515,7 +557,9 @@ class CnnAttentionBase(nn.Module):
 
     def define_relative_position_bias_table_3D(self, num_win_h=100, num_win_w=100, num_win_d=100):
         self.relative_position_bias_table = nn.Parameter(
-            torch.zeros((2 * num_win_h - 1) * (2 * num_win_w - 1) * (2 * num_win_d - 1), self.n_head)
+            torch.zeros(
+                (2 * num_win_h - 1) * (2 * num_win_w - 1) * (2 * num_win_d - 1), self.n_head
+            )
         )
         nn.init.trunc_normal_(self.relative_position_bias_table, std=0.02)
 
@@ -524,9 +568,13 @@ class CnnAttentionBase(nn.Module):
         coords_h = torch.arange(num_win_h)
         coords_w = torch.arange(num_win_w)
         coords_d = torch.arange(num_win_d)
-        coords = torch.stack(torch.meshgrid(coords_h, coords_w, coords_d, indexing="ij"))  # 3, Wh, Ww, Wd
+        coords = torch.stack(
+            torch.meshgrid(coords_h, coords_w, coords_d, indexing="ij")
+        )  # 3, Wh, Ww, Wd
         coords_flatten = torch.flatten(coords, 1)  # 3, Wh*Ww*Wd
-        relative_coords = coords_flatten[:, :, None] - coords_flatten[:, None, :]  # 3, Wh*Ww*Wd, Wh*Ww*Wd
+        relative_coords = (
+            coords_flatten[:, :, None] - coords_flatten[:, None, :]
+        )  # 3, Wh*Ww*Wd, Wh*Ww*Wd
         relative_coords = relative_coords.permute(1, 2, 0).contiguous()  # Wh*Ww*Wd, Wh*Ww*Wd, 3
         relative_coords[:, :, 0] += num_win_h - 1  # shift to start from 0
         relative_coords[:, :, 1] += num_win_w - 1
@@ -538,7 +586,9 @@ class CnnAttentionBase(nn.Module):
 
     def get_relative_position_bias_3D(self, num_win_h, num_win_w, num_win_d) -> torch.Tensor:
         return _get_relative_position_bias_3D(
-            self.relative_position_bias_table, self.relative_position_index, (num_win_h, num_win_w, num_win_d)
+            self.relative_position_bias_table,
+            self.relative_position_index,
+            (num_win_h, num_win_w, num_win_d),
         )
 
     def define_relative_position_bias_table(self, num_win_h=100, num_win_w=100):
@@ -554,7 +604,9 @@ class CnnAttentionBase(nn.Module):
         coords_w = torch.arange(num_win_w)
         coords = torch.stack(torch.meshgrid(coords_h, coords_w, indexing="ij"))  # 2, Wh, Ww
         coords_flatten = torch.flatten(coords, 1)  # 2, Wh*Ww
-        relative_coords = coords_flatten[:, :, None] - coords_flatten[:, None, :]  # 2, Wh*Ww, Wh*Ww
+        relative_coords = (
+            coords_flatten[:, :, None] - coords_flatten[:, None, :]
+        )  # 2, Wh*Ww, Wh*Ww
         relative_coords = relative_coords.permute(1, 2, 0).contiguous()  # Wh*Ww, Wh*Ww, 2
         relative_coords[:, :, 0] += num_win_h - 1  # shift to start from 0
         relative_coords[:, :, 1] += num_win_w - 1
@@ -576,7 +628,11 @@ class CnnAttentionBase(nn.Module):
     def set_and_check_wind(self):
         if self.D > 1:
             if self.num_wind is not None:
-                self.window_size = [self.H // self.num_wind[0], self.W // self.num_wind[1], self.D // self.num_wind[2]]
+                self.window_size = [
+                    self.H // self.num_wind[0],
+                    self.W // self.num_wind[1],
+                    self.D // self.num_wind[2],
+                ]
                 self.window_size = [max(w, 1) for w in self.window_size]
                 self.num_wind = [
                     self.H // self.window_size[0],
@@ -590,7 +646,11 @@ class CnnAttentionBase(nn.Module):
                     self.D // self.window_size[2],
                 ]
                 self.num_wind = [max(n, 1) for n in self.num_wind]
-                self.window_size = [self.H // self.num_wind[0], self.W // self.num_wind[1], self.D // self.num_wind[2]]
+                self.window_size = [
+                    self.H // self.num_wind[0],
+                    self.W // self.num_wind[1],
+                    self.D // self.num_wind[2],
+                ]
 
             assert self.num_wind[2] * self.window_size[2] == self.D, (
                 f"self.num_wind[2]*self.window_size[2] == self.D, num_wind {self.num_wind}, window_size {self.window_size}, D {self.D}"
@@ -622,7 +682,9 @@ class CnnAttentionBase(nn.Module):
                     self.window_size[2] // self.num_patch[2],
                 ]
                 self.patch_size = [max(v, 1) for v in self.patch_size]
-                self.num_patch = [w // p for w, p in zip(self.window_size, self.patch_size, strict=False)]
+                self.num_patch = [
+                    w // p for w, p in zip(self.window_size, self.patch_size, strict=False)
+                ]
             else:
                 self.num_patch = [
                     self.window_size[0] // self.patch_size[0],
@@ -630,7 +692,9 @@ class CnnAttentionBase(nn.Module):
                     self.window_size[2] // self.patch_size[2],
                 ]
                 self.num_patch = [max(v, 1) for v in self.num_patch]
-                self.patch_size = [w // n for w, n in zip(self.window_size, self.num_patch, strict=False)]
+                self.patch_size = [
+                    w // n for w, n in zip(self.window_size, self.num_patch, strict=False)
+                ]
 
             assert (
                 (self.patch_size[0] * self.num_patch[0] == self.window_size[0])
@@ -641,13 +705,23 @@ class CnnAttentionBase(nn.Module):
             )
         else:
             if self.num_patch is not None:
-                self.patch_size = [self.window_size[0] // self.num_patch[0], self.window_size[1] // self.num_patch[1]]
+                self.patch_size = [
+                    self.window_size[0] // self.num_patch[0],
+                    self.window_size[1] // self.num_patch[1],
+                ]
                 self.patch_size = [max(v, 1) for v in self.patch_size]
-                self.num_patch = [w // p for w, p in zip(self.window_size, self.patch_size, strict=False)]
+                self.num_patch = [
+                    w // p for w, p in zip(self.window_size, self.patch_size, strict=False)
+                ]
             else:
-                self.num_patch = [self.window_size[0] // self.patch_size[0], self.window_size[1] // self.patch_size[1]]
+                self.num_patch = [
+                    self.window_size[0] // self.patch_size[0],
+                    self.window_size[1] // self.patch_size[1],
+                ]
                 self.num_patch = [max(v, 1) for v in self.num_patch]
-                self.patch_size = [w // n for w, n in zip(self.window_size, self.num_patch, strict=False)]
+                self.patch_size = [
+                    w // n for w, n in zip(self.window_size, self.num_patch, strict=False)
+                ]
 
             assert (self.patch_size[0] * self.num_patch[0] == self.window_size[0]) and (
                 self.patch_size[1] * self.num_patch[1] == self.window_size[1]
@@ -656,8 +730,12 @@ class CnnAttentionBase(nn.Module):
             )
 
     def validate_window_patch(self):
-        assert self.window_size[0] * self.num_wind[0] == self.H, "self.window_size[0]*self.num_wind[0] == self.H"
-        assert self.window_size[1] * self.num_wind[1] == self.W, "self.window_size[1]*self.num_wind[1] == self.W"
+        assert self.window_size[0] * self.num_wind[0] == self.H, (
+            "self.window_size[0]*self.num_wind[0] == self.H"
+        )
+        assert self.window_size[1] * self.num_wind[1] == self.W, (
+            "self.window_size[1]*self.num_wind[1] == self.W"
+        )
         assert self.patch_size[0] * self.num_patch[0] == self.window_size[0], (
             "self.patch_size[0]*self.num_patch[0] == self.window_size[0]"
         )
@@ -666,7 +744,9 @@ class CnnAttentionBase(nn.Module):
         )
 
         if self.D > 1:
-            assert self.window_size[2] * self.num_wind[2] == self.D, "self.window_size[2]*self.num_wind[2] == self.D"
+            assert self.window_size[2] * self.num_wind[2] == self.D, (
+                "self.window_size[2]*self.num_wind[2] == self.D"
+            )
             assert self.patch_size[2] * self.num_patch[2] == self.window_size[2], (
                 "self.patch_size[2]*self.num_patch[2] == self.window_size[2]"
             )

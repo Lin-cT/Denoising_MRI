@@ -84,7 +84,9 @@ class ViT3DAttention(CnnAttentionBase):
         if len(self.num_wind) == 2:
             self.num_wind.append(1)
 
-        print(f"{Fore.GREEN}--> Spatial, ViT3D, H {H}, W {W}, D {D}, win size {self.window_size}{Style.RESET_ALL}")
+        print(
+            f"{Fore.GREEN}--> Spatial, ViT3D, H {H}, W {W}, D {D}, win size {self.window_size}{Style.RESET_ALL}"
+        )
 
         if attention_type == "conv":
             # key, query, value projections convolution
@@ -109,7 +111,13 @@ class ViT3DAttention(CnnAttentionBase):
                     channel_first=True,
                 )
                 self.value = Conv3DExt(
-                    C_in, C_out, kernel_size=kernel_size, stride=stride, padding=padding, bias=True, channel_first=True
+                    C_in,
+                    C_out,
+                    kernel_size=kernel_size,
+                    stride=stride,
+                    padding=padding,
+                    bias=True,
+                    channel_first=True,
                 )
             else:
                 self.key = Conv2DExt(
@@ -131,7 +139,13 @@ class ViT3DAttention(CnnAttentionBase):
                     channel_first=True,
                 )
                 self.value = Conv2DExt(
-                    C_in, C_out, kernel_size=kernel_size, stride=stride, padding=padding, bias=True, channel_first=True
+                    C_in,
+                    C_out,
+                    kernel_size=kernel_size,
+                    stride=stride,
+                    padding=padding,
+                    bias=True,
+                    channel_first=True,
                 )
         elif attention_type == "lin":
             # linear projections
@@ -183,7 +197,9 @@ class ViT3DAttention(CnnAttentionBase):
         tm = start_timer(enable=self.with_timer)
         # add the relative positional bias
         if self.att_with_relative_position_bias:
-            relative_position_bias = self.get_relative_position_bias_3D(num_win_h, num_win_w, num_win_d)
+            relative_position_bias = self.get_relative_position_bias_3D(
+                num_win_h, num_win_w, num_win_d
+            )
             att = att + relative_position_bias
         end_timer(enable=self.with_timer, t=tm, msg="att_with_relative_position_bias_3D")
 
@@ -219,10 +235,18 @@ class ViT3DAttention(CnnAttentionBase):
                 "For lin attention_type with relative position bias, input H and W have to be the same as the class declaration."
             )
 
-        assert C == self.C_in, f"Input channel {C} does not match expected input channel {self.C_in}"
-        assert H % self.num_wind[0] == 0, f"Height {H} should be divisible by window num {self.num_wind[0]}"
-        assert W % self.num_wind[1] == 0, f"Width {W} should be divisible by window num {self.num_wind[1]}"
-        assert D % self.num_wind[2] == 0, f"Depth {D} should be divisible by window num {self.num_wind[2]}"
+        assert C == self.C_in, (
+            f"Input channel {C} does not match expected input channel {self.C_in}"
+        )
+        assert H % self.num_wind[0] == 0, (
+            f"Height {H} should be divisible by window num {self.num_wind[0]}"
+        )
+        assert W % self.num_wind[1] == 0, (
+            f"Width {W} should be divisible by window num {self.num_wind[1]}"
+        )
+        assert D % self.num_wind[2] == 0, (
+            f"Depth {D} should be divisible by window num {self.num_wind[2]}"
+        )
 
         if self.attention_type == "conv":
             tm = start_timer(enable=self.with_timer)

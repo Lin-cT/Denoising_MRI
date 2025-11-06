@@ -88,14 +88,19 @@ class OptimScheduler:
         param_dict = {pn: p for pn, p in module.named_parameters()}
         inter_params = decay & no_decay
         union_params = decay | no_decay
-        assert len(inter_params) == 0, f"parameters {inter_params!s} made it into both decay/no_decay sets!"
+        assert len(inter_params) == 0, (
+            f"parameters {inter_params!s} made it into both decay/no_decay sets!"
+        )
         assert len(param_dict.keys() - union_params) == 0, (
             f"parameters {param_dict.keys() - union_params!s} were not separated into either decay/no_decay set!"
         )
 
         # create the pytorch optimizer object
         optim_groups = [
-            {"params": [param_dict[pn] for pn in sorted(list(decay))], "weight_decay": wd},  # With weight decay group
+            {
+                "params": [param_dict[pn] for pn in sorted(list(decay))],
+                "weight_decay": wd,
+            },  # With weight decay group
             {
                 "params": [param_dict[pn] for pn in sorted(list(no_decay))],
                 "weight_decay": 0.0,
@@ -130,7 +135,10 @@ class OptimScheduler:
         optim_groups = self.configure_optim_groups()
 
         self.optim = SophiaG(
-            optim_groups, betas=(c.optim.beta1, c.optim.beta2), rho=c.optim.rho, weight_decay=c.optim.weight_decay
+            optim_groups,
+            betas=(c.optim.beta1, c.optim.beta2),
+            rho=c.optim.rho,
+            weight_decay=c.optim.weight_decay,
         )
 
         # get the list of max_lr

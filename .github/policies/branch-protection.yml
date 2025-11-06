@@ -7,7 +7,7 @@ where:
 configuration:
   branchProtectionRules:
     - branchNamePattern: "main"
-      requiredApprovingReviewsCount: 0
-      restrictsPushes: false
+      requiredApprovingReviewsCount: 1
+      restrictsPushes: true
       allowsForcePushes: false
       allowsDeletions: false

@@ -10,7 +10,6 @@ on:
     inputs:
       sha:
         description: 'the git sha to checkout'
-        default: ${{ github.sha }}
         required: true
         type: string
 permissions:

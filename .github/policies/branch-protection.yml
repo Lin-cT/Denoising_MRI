@@ -8,7 +8,6 @@ configuration:
   branchProtectionRules:
     - branchNamePattern: "main"
       requiredApprovingReviewsCount: 1
-      restrictsPushes: true
-      whoCanPush: []
+      restrictsPushes: false
       allowsForcePushes: false
       allowsDeletions: false

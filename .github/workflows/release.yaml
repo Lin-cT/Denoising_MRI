@@ -2,10 +2,6 @@ name: Release
 on:
   workflow_call:
     inputs:
-      sha:
-        description: 'the git sha to checkout'
-        required: true
-        type: string
       publish-docs:
         description: 'whether to publish docs to the github pages'
         required: true

@@ -51,5 +51,4 @@ jobs:
       - checks
       - codeql
     with:
-      sha: ${{ github.sha }}
       publish-docs: ${{ github.ref_name == 'main' }}

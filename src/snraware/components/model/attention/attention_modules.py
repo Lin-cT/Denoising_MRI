@@ -1,4 +1,3 @@
-# type: ignore[reportUninitializedInstanceVariable]
 """
 Attention modules for the Imaging-FM project.
 

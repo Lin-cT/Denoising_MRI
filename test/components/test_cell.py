@@ -1,4 +1,4 @@
-# type: ignore[reportUninitializedInstanceVariable]
+
 import os
 from pathlib import Path
 

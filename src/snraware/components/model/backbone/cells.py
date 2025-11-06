@@ -1,4 +1,3 @@
-
 """
 This file implements the cell structure in the model architecture. A cell is a 'transformer module' consisting
 of attention layers, normalization layers and mixers with non-linearities.

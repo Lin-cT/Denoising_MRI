@@ -1,4 +1,3 @@
-
 """
 A block contains a set of cells. Block structure is configurable by the 'block string'.
 For example, 'L1T1G1' means to configure with a local attention (L1) with mixer (1 after 'L'), followed by a temporal attention with mixer (T1)

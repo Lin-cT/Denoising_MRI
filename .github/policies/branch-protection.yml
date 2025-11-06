@@ -9,5 +9,6 @@ configuration:
     - branchNamePattern: "main"
       requiredApprovingReviewsCount: 1
       restrictsPushes: true
+      whoCanPush: []
       allowsForcePushes: false
       allowsDeletions: false

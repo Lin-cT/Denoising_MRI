@@ -4,6 +4,8 @@ on:
     branches: [ "main" ]
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+"
+  pull_request:
+    branches: [ main ]
 permissions:
   contents: write
   actions: read
@@ -50,4 +52,4 @@ jobs:
       - codeql
     with:
       sha: ${{ github.sha }}
-      publish-docs: true
+      publish-docs: ${{ github.ref_name == 'main' }}

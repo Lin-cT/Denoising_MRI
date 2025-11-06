@@ -6,7 +6,7 @@ from snraware.components.heads import (
     PreConv2D,
     SimpleConv2d,
 )
-from snraware.components.setup import Timer, set_seed
+from snraware.components.setup import set_seed
 
 # -----------------------------------------------------------------
 
@@ -70,23 +70,15 @@ class TestModel:
         input = torch.randn(B, C_in, D, H, W, dtype=torch.float32)
         backbone_output = torch.randn(B, backbone_C, D, H, W, dtype=torch.float32)
 
-        timer = Timer()
-
         with torch.inference_mode():
-            with timer("PreConv2D"):
-                y = PreConv2D(input)
-                assert y.shape == (B, backbone_C, D, H, W)
+            y = PreConv2D(input)
+            assert y.shape == (B, backbone_C, D, H, W)
 
-            with timer("PoolLinear"):
-                y = PoolLinear(backbone_output)
-                assert y.shape == (B, num_classes)
+            y = PoolLinear(backbone_output)
+            assert y.shape == (B, num_classes)
 
-            with timer("SimpleConv2d"):
-                y = SimpleConv2d(backbone_output)
-                assert y.shape == (B, num_seg_classes, D, H, W)
-
-        print(f"Timer summary: {timer.get_summary().to_string(max_cols=120)}")
-
+            y = SimpleConv2d(backbone_output)
+            assert y.shape == (B, num_seg_classes, D, H, W)
 
 # ---------------------------------------------------------------
 

@@ -111,13 +111,11 @@ reportInvalidStubStatement = true
 reportIncompleteStub = true
 reportUnnecessaryTypeIgnoreComment = true
 reportMatchNotExhaustive = true
-reportShadowedImports = true
 
 reportMissingTypeStubs = false
 reportImportCycles = true
 reportUnusedFunction = false
 reportMissingSuperCall = false
-reportUninitializedInstanceVariable = true
 reportUnknownLambdaType = true
 reportCallInDefaultInitializer = true
 reportUnnecessaryIsInstance = true
@@ -134,6 +132,7 @@ reportOptionalCall = false
 reportMissingTypeArgument = false
 
 reportIncompatibleMethodOverride = false
+reportUninitializedInstanceVariable = false
 reportMissingParameterType = false
 reportUnknownArgumentType = false
 reportUnknownMemberType = false

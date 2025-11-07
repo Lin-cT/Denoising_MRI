@@ -35,6 +35,9 @@ python3 ./src/ifm/mri/denoising/run.py logging.use_wandb=True backbone.block_str
 
 # a medium model, 55.1 M parameters
 python3 ./src/ifm/mri/denoising/run.py logging.use_wandb=True backbone.block_str=\[\'T1L1G1T1L1G1\',\ \'T1L1G1T1L1G1\'\] trainer.max_epochs=320
+
+# a large model, 109 M parameters
+python3 ./src/ifm/mri/denoising/run.py logging.use_wandb=True backbone.block_str=\[\'T1L1G1T1L1G1T1L1G1T1L1G1\',\ \'T1L1G1T1L1G1T1L1G1T1L1G1\'\] trainer.max_epochs=320
 ```
 
 User needs to log into the wandb as `wandb login`. Training and validation samples will be uploaded to wandb as videos. 

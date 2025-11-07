@@ -83,7 +83,7 @@ class TestHRnet:
         )
 
         gt_fname = os.path.join(self.data_root, f"test_out_{backbone}.npy")
-        #np.save(gt_fname, test_out.detach().cpu().numpy())
+        # np.save(gt_fname, test_out.detach().cpu().numpy())
         assert os.path.exists(gt_fname)
         test_out_gt = np.load(gt_fname)
         assert (

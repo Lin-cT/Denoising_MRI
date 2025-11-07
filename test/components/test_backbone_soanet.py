@@ -68,7 +68,7 @@ class TestSOAnet:
         set_seed(7878756)
 
         print(
-            f"{Fore.GREEN}-------------> SOAUNet -- {bk} -- {downsample} <----------------------{Style.RESET_ALL}"
+            f"{Fore.GREEN}-------------> SOANet -- {bk} -- {downsample} <----------------------{Style.RESET_ALL}"
         )
 
         self.cfg.backbone.block_str = bk

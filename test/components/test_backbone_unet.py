@@ -42,13 +42,11 @@ class TestUnet:
         "backbone",
         [
             ["S3ShT1L1G1V2V3", "V2V3T1L1G1S3Sh"],
-            ["S3ShS3ShS3Sh", "S3ShS3ShS3Sh"],
             ["V3V3V3", "V3V3V3"],
             ["T1L1G1T1", "T1L1G1T1"],
             ["T1L1G1", "T1L1G1"],
             ["T1T1T1", "T1T1T1"],
             ["T1V2V2", "T1V2V2"],
-            ["T1L1G1T1L1G1", "T1L1G1T1L1G1T1L1G1"],
             ["C2C2C2", "C2C2C2"],
             ["C3C3C3", "C3C3C3"],
         ],

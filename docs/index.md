@@ -60,12 +60,11 @@ Two models are released at https://huggingface.co/microsoft/SNRAware
 - SNRAwarelarge: 109million parameters
 
 ## Direct intended uses
-SNRAware is shared for research purposes only, namely, benchmarking and inference on downstream
-tasks. This is a research model which should not be used in any clinical or production scenario.
+SNRAware is shared for research and technical development purposes only, to denoise MR images.
 
 ## License and Usage Notices
-The data, code, and model checkpoints described in this repository is provided for research use
-only. The data, code, and model checkpoints is not intended for use in clinical use.
+The data, code, and model checkpoints described in this repository is provided for research and technical development use
+only. The data, code, and model checkpoints are not intended for use in clinical use.
 
 ## Trademarks
 

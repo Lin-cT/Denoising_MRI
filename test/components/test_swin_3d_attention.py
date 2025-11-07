@@ -136,10 +136,3 @@ class TestSwin3DAttention:
                                 end_timer(enable=with_timer, t=t0, msg="backward pass")
 
                                 print(f"attention_type is {attention_type}, mse is {mse.item()}")
-
-
-if __name__ == "__main__":
-    t = TestSwin3DAttention()
-    t.setup_class()
-    t.test()
-    t.teardown_class()

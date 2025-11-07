@@ -163,10 +163,3 @@ class TestGlobal3DAttention:
                                     att.to(device=device)
 
                                     test_out = att(test_in2)
-
-
-if __name__ == "__main__":
-    t = TestGlobal3DAttention()
-    t.setup_class()
-    t.test()
-    t.teardown_class()

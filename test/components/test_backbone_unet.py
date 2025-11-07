@@ -99,10 +99,3 @@ class TestUnet:
 
         del model
         torch.cuda.empty_cache()
-
-
-if __name__ == "__main__":
-    t = TestUnet()
-    t.setup_class()
-    t.test()
-    t.teardown_class()

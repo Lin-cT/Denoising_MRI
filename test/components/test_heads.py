@@ -102,9 +102,3 @@ class TestModel:
 
 
 # ---------------------------------------------------------------
-
-if __name__ == "__main__":
-    t = TestModel()
-    t.setup_class()
-    t.test_heads()
-    t.teardown_class()

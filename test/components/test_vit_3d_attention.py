@@ -169,10 +169,3 @@ class TestViT3D:
         print("Passed ViT3DAttention tests")
 
         print("Passed all tests")
-
-
-if __name__ == "__main__":
-    t = TestViT3D()
-    t.setup_class()
-    t.test_Vit3D()
-    t.teardown_class()

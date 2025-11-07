@@ -102,10 +102,3 @@ class TestHRnet:
         torch.cuda.empty_cache()
 
         print(f"{'***' * 20}")
-
-
-if __name__ == "__main__":
-    t = TestHRnet()
-    t.setup_class()
-    t.test(backbone=["S3ShT1L1G1V2V3", "V2V3T1L1G1S3Sh"])
-    t.teardown_class()

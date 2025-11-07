@@ -161,10 +161,3 @@ class TestSpatialGlobalAttention:
                                 mse = loss(test_in, test_out[:, :C])
                                 mse.backward()
                                 end_timer(enable=with_timer, t=t0, msg="backward pass")
-
-
-if __name__ == "__main__":
-    t = TestSpatialGlobalAttention()
-    t.setup_class()
-    t.test()
-    t.teardown_class()

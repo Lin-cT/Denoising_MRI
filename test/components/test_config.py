@@ -25,11 +25,3 @@ def test_config_with_overrides():
     assert config.num_of_channels == 15
     assert config.block.cell_type == "parallel"
     assert config.block.cell.att_dropout_p == 0.7
-
-
-if __name__ == "__main__":
-    with initialize(version_base=None, config_path="../../src/snraware/components/configs"):
-        cfg = compose(config_name="config", overrides=["backbone=hrnet"])
-    print(OmegaConf.to_yaml(cfg))
-
-    test_config_with_overrides()

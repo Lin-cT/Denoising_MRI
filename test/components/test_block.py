@@ -106,10 +106,3 @@ class TestBlock:
                 / np.linalg.norm(test_out_gt)
                 < 2e-3
             )
-
-
-if __name__ == "__main__":
-    t = TestBlock()
-    t.setup_class()
-    t.test(block_str="T1L1G1T1")
-    t.teardown_class()

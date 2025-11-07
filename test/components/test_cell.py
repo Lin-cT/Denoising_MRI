@@ -158,10 +158,3 @@ class TestCell:
                                         / np.linalg.norm(test_out_gt)
                                         < 1e-3
                                     )
-
-
-if __name__ == "__main__":
-    t = TestCell()
-    t.setup_class()
-    t.test()
-    t.teardown_class()

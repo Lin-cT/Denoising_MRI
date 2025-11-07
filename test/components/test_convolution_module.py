@@ -93,10 +93,3 @@ class TestConvolutionModule:
             end_timer(enable=with_timer, t=t0, msg="backward pass")
 
         print("Passed all tests")
-
-
-if __name__ == "__main__":
-    t = TestConvolutionModule()
-    t.setup_class()
-    t.test()
-    t.teardown_class()

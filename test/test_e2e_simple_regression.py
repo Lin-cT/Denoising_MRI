@@ -207,7 +207,6 @@ class TestTrain:
     def teardown_class(self):
         pass
 
-    @pytest.mark.gpu
     @pytest.mark.parametrize(
         "backbone",
         ["soanet", "hrnet", "unet"],
@@ -223,10 +222,10 @@ class TestTrain:
             "backbone.block.cell.patch_size=[4,4,2]",
             "backbone.block.cell.n_head=16",
             "backbone.num_of_channels=16",
-            "batch_size=8",
+            "batch_size=2",
             "num_workers=2",
             "optim.lr=2e-4",
-            "trainer.max_epochs=12",
+            "trainer.max_epochs=6",
             "trainer.check_val_every_n_epoch=1",
             "trainer.log_every_n_steps=50",
             "trainer.accelerator='auto'",

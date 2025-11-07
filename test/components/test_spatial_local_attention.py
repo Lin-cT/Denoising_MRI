@@ -176,10 +176,3 @@ class TestSpatialLocalAttention:
                                 end_timer(
                                     enable=with_timer, t=t0, msg=f"forward pass -{test_in2.shape}"
                                 )
-
-
-if __name__ == "__main__":
-    t = TestSpatialLocalAttention()
-    t.setup_class()
-    t.test()
-    t.teardown_class()

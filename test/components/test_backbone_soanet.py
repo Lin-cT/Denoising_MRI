@@ -104,10 +104,3 @@ class TestSOAnet:
 
         del model
         torch.cuda.empty_cache()
-
-
-if __name__ == "__main__":
-    t = TestSOAnet()
-    t.setup_class()
-    t.test()
-    t.teardown_class()

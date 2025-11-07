@@ -56,7 +56,6 @@ class TestHRnet:
     def test(self, backbone):
         with_timer = True
         device = get_device()
-        device = "cpu"
 
         _B, C, T, H, W = 1, 2, 16, 16, 16
         test_in = torch.from_numpy(self.test_in).to(dtype=torch.float32, device=device)
@@ -84,7 +83,7 @@ class TestHRnet:
         )
 
         gt_fname = os.path.join(self.data_root, f"test_out_{backbone}.npy")
-        np.save(gt_fname, test_out.detach().cpu().numpy())
+        #np.save(gt_fname, test_out.detach().cpu().numpy())
         assert os.path.exists(gt_fname)
         test_out_gt = np.load(gt_fname)
         assert (

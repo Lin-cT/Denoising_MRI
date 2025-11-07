@@ -28,7 +28,7 @@ jobs:
       # Build the Docker image
       - name: Build Docker Image
         run: |
-          uv version "$PACKAGE_VERSION"
+          uv version "$PACKAGE_VERSION" --no-sync
           echo "building image: snraware:${PACKAGE_VERSION}"
           docker build -f Containerfile -t snraware:${PACKAGE_VERSION} .
           echo "testing installation in image"

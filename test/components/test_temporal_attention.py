@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 import numpy as np
+import pytest
 import torch
 
 from snraware.components.model.attention import TemporalChannelCnnAttention, TemporalCnnAttention
@@ -25,6 +26,7 @@ class TestTemporalAttention:
     def teardown_class(self):
         pass
 
+    @pytest.mark.gpu
     def test(self):
         print("Begin Testing")
 

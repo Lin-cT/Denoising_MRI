@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 import numpy as np
+import pytest
 import torch
 from colorama import Fore, Style
 
@@ -27,6 +28,7 @@ class TestSwin3DAttention:
     def teardown_class(self):
         pass
 
+    @pytest.mark.gpu
     def test(self):
         t = np.arange(256)
         t = np.reshape(t, (16, 16))

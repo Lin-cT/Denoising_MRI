@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 import numpy as np
+import pytest
 import torch
 
 from snraware.components.model.attention import ViT3DAttention
@@ -26,6 +27,7 @@ class TestViT3D:
     def teardown_class(self):
         pass
 
+    @pytest.mark.gpu
     def test_Vit3D(self):
         print("Begin Testing")
 

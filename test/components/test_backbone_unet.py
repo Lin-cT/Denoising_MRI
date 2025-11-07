@@ -38,6 +38,7 @@ class TestUnet:
     def teardown_class(self):
         pass
 
+    @pytest.mark.gpu
     @pytest.mark.parametrize(
         "backbone",
         [

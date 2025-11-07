@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 import numpy as np
+import pytest
 import torch
 
 from snraware.components.model import Cell, Parallel_Cell
@@ -23,6 +24,7 @@ class TestCell:
     def teardown_class(self):
         pass
 
+    @pytest.mark.gpu
     def test(self):
         B, T, C, H, W = 1, 16, 2, 64, 64
         C_out = 8

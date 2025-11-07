@@ -38,6 +38,7 @@ class TestSOAnet:
     def teardown_class(self):
         pass
 
+    @pytest.mark.gpu
     @pytest.mark.parametrize("downsample", [1, 0])
     @pytest.mark.parametrize(
         "backbone",

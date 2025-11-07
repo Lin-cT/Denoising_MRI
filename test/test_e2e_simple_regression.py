@@ -207,6 +207,7 @@ class TestTrain:
     def teardown_class(self):
         pass
 
+    @pytest.mark.gpu
     @pytest.mark.parametrize(
         "backbone",
         ["soanet", "hrnet", "unet"],

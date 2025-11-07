@@ -32,7 +32,7 @@ backbone:
 
 optim:
   lr: 1e-5
-  weight_decay: 1.0
+  weight_decay: 0.0
 
 step_mode:
   total_steps: 0 # 0 means using trainer.max_epochs to compute the total steps
@@ -53,12 +53,9 @@ prefetch_factor: 8
 loss: ["mse", "perpendicular", "perceptual", "charbonnier", "gaussian3d"]
 loss_weights: [1.0, 1.0, 1.0, 1.0, 1.0]
 
-contrastive_loss: ["mse", "perpendicular", "perceptual", "charbonnier"]
-contrastive_loss_weights: [1, 1, 1, 1]
-
 scale_model_output_with_noise_level: false
 
-val_data_portion: 0.1
+val_data_portion: 0.04
 overlap_for_inference: [16, 16, 8]
 
 device_mesh: [2, 2]

@@ -3,7 +3,7 @@ _target_: snraware.projects.mri.denoising.data.MRIDenoisingDataset
 cutout_shape: [64, 64, 16]
 repetition: 1
 min_noise_level: 0.1
-max_noise_level: 32.0
+max_noise_level: 128.0
 kspace_filter_sigma: [0.8, 1.0, 1.5, 2.0, 2.25]
 kspace_filter_sigma_T: [0.25, 0.5, 0.65, 0.85, 1.0, 1.5, 2.0, 2.25]
 prob_apply_filter_T: 0.2

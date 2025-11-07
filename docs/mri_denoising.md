@@ -27,6 +27,16 @@ The project source files reside in `src/snraware/projects/mri/denoising`. The ma
 ```bash
 python3 ./src/snraware/projects/mri/denoising/run.py logging.use_wandb=True trainer.max_epochs=32 batch_size=1
 ```
+
+To train the release small and medium models:
+```bash
+# a small model, 27.7 M parameters
+python3 ./src/ifm/mri/denoising/run.py logging.use_wandb=True backbone.block_str=\[\'T1L1G1\',\ \'T1L1G1\'\] trainer.max_epochs=320
+
+# a medium model, 55.1 M parameters
+python3 ./src/ifm/mri/denoising/run.py logging.use_wandb=True backbone.block_str=\[\'T1L1G1T1L1G1\',\ \'T1L1G1T1L1G1\'\] trainer.max_epochs=320
+```
+
 User needs to log into the wandb as `wandb login`. Training and validation samples will be uploaded to wandb as videos. 
 ![wandb](./images/wandb.png)
 
@@ -35,8 +45,8 @@ User needs to log into the wandb as `wandb login`. Training and validation sampl
 After training the model, user can run inference with `run_inference.py` in the `src/snraware/projects/mri/denoising` folder:
 
 ```bash
-export model_file="model.pth"
-export config_file="config.yaml"
+export model_file="SNRAware-small.pts"
+export config_file="SNRAware-small_config.yaml"
 export res_dir="res"
 export data_dir="/data"
 

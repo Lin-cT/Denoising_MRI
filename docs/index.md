@@ -76,4 +76,4 @@ Any use of third-party trademarks or logos are subject to those third-party's po
 
 ## Documentation
 
-Please find documentation in the [docs](./docs/index.md).
+Please find documentation in the [docs/overview](./docs/overview.md).

@@ -49,6 +49,7 @@ jobs:
     with:
       sha: ${{ inputs.sha || github.sha }}
   auto-merge:
+    if: github.event_name == 'pull_request'
     uses: ./.github/workflows/auto-merge.yaml
     secrets: inherit
   release:

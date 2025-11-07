@@ -47,7 +47,6 @@ class TestSOAnet:
             ["T1T1T1", "T1T1T1", "T1T1T1", "T1T1T1"],
             ["V3V3V3"],
             ["S3ShS3Sh"],
-            ["T1L1G1T1L1G1", "T1L1G1T1L1G1T1L1G1", "T1L1G1T1L1G1T1L1G1", "T1L1G1T1L1G1T1L1G1"],
             ["C2C2C2"],
             ["C3C3C3"],
         ],

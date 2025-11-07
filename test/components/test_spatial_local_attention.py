@@ -9,6 +9,7 @@ from snraware.components.setup import end_timer, get_device, set_seed, start_tim
 
 # -----------------------------------------------------------------
 
+
 class TestSpatialLocalAttention:
     def setup_class(self):
         set_seed(358)
@@ -147,7 +148,7 @@ class TestSpatialLocalAttention:
 
                                 fname = f"{attention_type}_{normalize_Q_K}_{att_with_output_proj}_{cosine_att}_{att_with_relative_position_bias}_{stride_qk}"
                                 gt_fname = os.path.join(self.data_root, f"test_out_{fname}.npy")
-                                #np.save(gt_fname, test_out.detach().cpu().numpy())
+                                # np.save(gt_fname, test_out.detach().cpu().numpy())
                                 assert os.path.exists(gt_fname)
                                 test_out_gt = np.load(
                                     os.path.join(self.data_root, f"test_out_{fname}.npy")

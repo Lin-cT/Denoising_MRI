@@ -9,6 +9,7 @@ from snraware.components.setup import get_device, set_seed
 
 # -----------------------------------------------------------------
 
+
 class TestCell:
     def setup_class(self):
         set_seed(1854417)
@@ -89,7 +90,7 @@ class TestCell:
                                         gt_fname = os.path.join(
                                             self.data_root, f"test_out_STCNNT_Cell_{fname}.npy"
                                         )
-                                        #np.save(gt_fname, test_out.detach().cpu().numpy())
+                                        # np.save(gt_fname, test_out.detach().cpu().numpy())
                                         assert os.path.exists(gt_fname)
                                         test_out_gt = np.load(
                                             os.path.join(
@@ -139,7 +140,7 @@ class TestCell:
                                         self.data_root,
                                         f"test_out_STCNNT_Parallel_Cell_{fname}.npy",
                                     )
-                                    #np.save(gt_fname, test_out.detach().cpu().numpy())
+                                    # np.save(gt_fname, test_out.detach().cpu().numpy())
                                     assert os.path.exists(gt_fname)
                                     test_out_gt = np.load(
                                         os.path.join(

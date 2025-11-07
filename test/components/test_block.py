@@ -15,6 +15,7 @@ from snraware.components.setup import get_device, set_seed
 
 # -----------------------------------------------------------------
 
+
 class TestBlock:
     def setup_class(self):
         set_seed(4587962)
@@ -96,7 +97,7 @@ class TestBlock:
             test_out = a_block(torch.clone(test_in))
 
             gt_fname = os.path.join(self.data_root, f"test_out_{fname}.npy")
-            #np.save(gt_fname, test_out.detach().cpu().numpy())
+            # np.save(gt_fname, test_out.detach().cpu().numpy())
             assert os.path.exists(gt_fname)
             test_out_gt = np.load(gt_fname)
             assert (

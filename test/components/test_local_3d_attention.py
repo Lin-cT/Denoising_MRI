@@ -9,6 +9,7 @@ from snraware.components.setup import end_timer, get_device, set_seed, start_tim
 
 # -----------------------------------------------------------------
 
+
 class TestLocal3DAttention:
     def setup_class(self):
         set_seed(1467865)

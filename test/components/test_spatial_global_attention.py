@@ -2,15 +2,13 @@ import os
 from pathlib import Path
 
 import numpy as np
-import pytest
 import torch
 
 from snraware.components.model.attention import SpatialGlobalAttention
 from snraware.components.setup import end_timer, get_device, set_seed, start_timer
 
-
 # -----------------------------------------------------------------
-@pytest.mark.gpu
+
 class TestSpatialGlobalAttention:
     def setup_class(self):
         set_seed(358)

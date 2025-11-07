@@ -12,9 +12,8 @@ from omegaconf import OmegaConf
 from snraware.components.model import SOAnet
 from snraware.components.setup import end_timer, get_device, set_seed, start_timer
 
-
 # -----------------------------------------------------------------
-@pytest.mark.gpu
+
 class TestSOAnet:
     def setup_class(self):
         set_seed(7878756)

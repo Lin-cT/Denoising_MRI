@@ -13,9 +13,8 @@ from snraware.components.model import Block
 from snraware.components.model.config import create_block_config
 from snraware.components.setup import get_device, set_seed
 
-
 # -----------------------------------------------------------------
-@pytest.mark.gpu
+
 class TestBlock:
     def setup_class(self):
         set_seed(4587962)
@@ -25,8 +24,6 @@ class TestBlock:
 
         self.test_path = str(Current_DIR)
         self.data_root = str(Current_DIR) + "/../data/block"
-
-        self.test_in = np.load(os.path.join(self.data_root, "test_in.npy"))
 
         with initialize(version_base=None, config_path="../../src/snraware/components/configs"):
             cfg = compose(config_name="config")
@@ -73,7 +70,7 @@ class TestBlock:
         test_in = torch.rand(B, T, C, H, W)
 
         device = get_device()
-        test_in = test_in.to(device=device)
+        test_in = test_in.to(device=device, dtype=torch.float32)
         test_in = torch.permute(test_in, [0, 2, 1, 3, 4])
 
         self.cfg.block.cell.n_head = 8
@@ -99,7 +96,7 @@ class TestBlock:
             test_out = a_block(torch.clone(test_in))
 
             gt_fname = os.path.join(self.data_root, f"test_out_{fname}.npy")
-            # np.save(gt_fname, test_out.detach().cpu().numpy())
+            #np.save(gt_fname, test_out.detach().cpu().numpy())
             assert os.path.exists(gt_fname)
             test_out_gt = np.load(gt_fname)
             assert (

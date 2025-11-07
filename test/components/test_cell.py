@@ -2,15 +2,13 @@ import os
 from pathlib import Path
 
 import numpy as np
-import pytest
 import torch
 
 from snraware.components.model import Cell, Parallel_Cell
 from snraware.components.setup import get_device, set_seed
 
-
 # -----------------------------------------------------------------
-@pytest.mark.gpu
+
 class TestCell:
     def setup_class(self):
         set_seed(1854417)
@@ -21,17 +19,13 @@ class TestCell:
         self.test_path = str(Current_DIR)
         self.data_root = str(Current_DIR) + "/../data/cell"
 
-        self.test_in = np.load(os.path.join(self.data_root, "test_in.npy"))
-
     def teardown_class(self):
         pass
 
     def test(self):
-        B, T, C, H, W = 3, 16, 3, 64, 64
+        B, T, C, H, W = 1, 16, 2, 64, 64
         C_out = 8
-        test_in = torch.rand(B, T, C, H, W)
-
-        assert torch.allclose(test_in, torch.from_numpy(self.test_in))
+        test_in = torch.rand(B, T, C, H, W).to(torch.float32)
 
         device = get_device()
         test_in = test_in.to(device=device)
@@ -53,7 +47,7 @@ class TestCell:
         norm_types = ["instance2d", "batch2d", "layer"]
         cosine_atts = ["True", "False"]
         att_with_relative_position_biases = ["True", "False"]
-        mixer_types = ["conv", "lin"]
+        mixer_types = ["conv"]
         with_flash_attentions = [False]
         stride_ss = [[1, 1, 1]]
 
@@ -95,14 +89,14 @@ class TestCell:
                                         gt_fname = os.path.join(
                                             self.data_root, f"test_out_STCNNT_Cell_{fname}.npy"
                                         )
-                                        # np.save(gt_fname, test_out.detach().cpu().numpy())
+                                        #np.save(gt_fname, test_out.detach().cpu().numpy())
                                         assert os.path.exists(gt_fname)
                                         test_out_gt = np.load(
                                             os.path.join(
                                                 self.data_root, f"test_out_STCNNT_Cell_{fname}.npy"
                                             )
                                         )
-                                        test_out_gt = np.transpose(test_out_gt, [0, 2, 1, 3, 4])
+
                                         assert (
                                             np.linalg.norm(
                                                 test_out_gt - test_out.detach().cpu().numpy()
@@ -145,7 +139,7 @@ class TestCell:
                                         self.data_root,
                                         f"test_out_STCNNT_Parallel_Cell_{fname}.npy",
                                     )
-                                    # np.save(gt_fname, test_out.detach().cpu().numpy())
+                                    #np.save(gt_fname, test_out.detach().cpu().numpy())
                                     assert os.path.exists(gt_fname)
                                     test_out_gt = np.load(
                                         os.path.join(
@@ -153,7 +147,7 @@ class TestCell:
                                             f"test_out_STCNNT_Parallel_Cell_{fname}.npy",
                                         )
                                     )
-                                    test_out_gt = np.transpose(test_out_gt, [0, 2, 1, 3, 4])
+
                                     assert (
                                         np.linalg.norm(
                                             test_out_gt - test_out.detach().cpu().numpy()

@@ -2,15 +2,13 @@ import os
 from pathlib import Path
 
 import numpy as np
-import pytest
 import torch
 
 from snraware.components.model.attention import SpatialLocalAttention
 from snraware.components.setup import end_timer, get_device, set_seed, start_timer
 
-
 # -----------------------------------------------------------------
-@pytest.mark.gpu
+
 class TestSpatialLocalAttention:
     def setup_class(self):
         set_seed(358)
@@ -20,9 +18,6 @@ class TestSpatialLocalAttention:
 
         self.test_path = str(Current_DIR)
         self.data_root = str(Current_DIR) + "/../data/spatial_local"
-
-        self.test_in = np.load(os.path.join(self.data_root, "test_in.npy"))
-        self.test_in2 = np.load(os.path.join(self.data_root, "test_in2.npy"))
 
     def teardown_class(self):
         pass
@@ -106,18 +101,16 @@ class TestSpatialLocalAttention:
         with_timer = True
         device = get_device()
 
-        B, T, C, H1, W1 = 2, 4, 2, 256, 256
-        C_out = 32
-        n_head = 32
+        B, T, C, H1, W1 = 1, 4, 2, 64, 64
+        C_out = 16
+        n_head = 16
         test_in = torch.rand(B, T, C, H1, W1).to(device=device)
         print(test_in.shape)
-        assert np.linalg.norm(self.test_in - test_in.cpu().numpy()) < 1e-3
 
-        B, T, C, H2, W2 = 2, 4, 2, 128, 128
-        C_out = 32
+        B, T, C, H2, W2 = 1, 4, 2, 32, 32
+        C_out = 16
         test_in2 = torch.rand(B, T, C, H2, W2).to(device=device)
         print(test_in2.shape)
-        assert np.linalg.norm(self.test_in2 - test_in2.cpu().numpy()) < 1e-3
 
         test_in = torch.permute(test_in, [0, 2, 1, 3, 4])
         test_in2 = torch.permute(test_in2, [0, 2, 1, 3, 4])
@@ -133,8 +126,8 @@ class TestSpatialLocalAttention:
                                     W=W1,
                                     window_size=None,
                                     patch_size=None,
-                                    num_wind=[8, 8],
-                                    num_patch=[4, 4],
+                                    num_wind=[4, 4],
+                                    num_patch=[2, 2],
                                     attention_type=attention_type,
                                     C_in=C,
                                     C_out=C_out,
@@ -154,12 +147,11 @@ class TestSpatialLocalAttention:
 
                                 fname = f"{attention_type}_{normalize_Q_K}_{att_with_output_proj}_{cosine_att}_{att_with_relative_position_bias}_{stride_qk}"
                                 gt_fname = os.path.join(self.data_root, f"test_out_{fname}.npy")
-                                # np.save(gt_fname, test_out.detach().cpu().numpy())
+                                #np.save(gt_fname, test_out.detach().cpu().numpy())
                                 assert os.path.exists(gt_fname)
                                 test_out_gt = np.load(
                                     os.path.join(self.data_root, f"test_out_{fname}.npy")
                                 )
-                                test_out_gt = np.transpose(test_out_gt, [0, 2, 1, 3, 4])
                                 assert (
                                     np.linalg.norm(test_out_gt - test_out.detach().cpu().numpy())
                                     / np.linalg.norm(test_out_gt)

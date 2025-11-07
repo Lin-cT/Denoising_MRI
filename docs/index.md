@@ -52,6 +52,12 @@ just test
 ## Data
 Dataset for MR denoising training is not opened at this moment.
 
+## Model
+Two models are released at https://huggingface.co/microsoft/SNRAware
+
+- SNRAware-small: 27.7million parameters
+- SNRAware-medium: 55.1million parameters
+
 ## Direct intended uses
 SNRAware is shared for research purposes only, namely, benchmarking and inference on downstream
 tasks. This is a research model which should not be used in any clinical or production scenario.

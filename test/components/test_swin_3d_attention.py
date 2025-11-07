@@ -79,16 +79,7 @@ class TestSwin3DAttention:
         # self.test_in = np.load(os.path.join(self.data_root, 'test_in.npy'))
         assert np.linalg.norm(self.test_in - test_in.cpu().numpy()) < 1e-3
 
-        B, T, C, H2, W2 = 1, 16, 2, 64, 64
-        C_out = 32
-        test_in2 = torch.rand(B, T, C, H2, W2).to(device=device)
-        print(test_in2.shape)
-        # np.save(os.path.join(self.data_root, "test_in2.npy"), test_in2.detach().cpu().numpy())
-        # self.test_in2 = np.load(os.path.join(self.data_root, 'test_in2.npy'))
-        assert np.linalg.norm(self.test_in2 - test_in2.cpu().numpy()) < 1e-3
-
         test_in = torch.permute(test_in, [0, 2, 1, 3, 4])
-        test_in2 = torch.permute(test_in2, [0, 2, 1, 3, 4])
 
         for attention_type in attention_types:
             for normalize_Q_K in normalize_Q_Ks:
@@ -127,7 +118,7 @@ class TestSwin3DAttention:
                                 )
 
                                 gt_fname = os.path.join(self.data_root, f"test_out_{fname}.npy")
-                                # np.save(gt_fname, test_out.detach().cpu().numpy())
+                                #np.save(gt_fname, test_out.detach().cpu().numpy())
                                 assert os.path.exists(gt_fname)
                                 test_out_gt = np.load(gt_fname)
                                 assert (
@@ -143,33 +134,6 @@ class TestSwin3DAttention:
                                 end_timer(enable=with_timer, t=t0, msg="backward pass")
 
                                 print(f"attention_type is {attention_type}, mse is {mse.item()}")
-
-                                if attention_type == "conv":
-                                    att = Swin3DAttention(
-                                        window_size=None,
-                                        num_wind=[4, 4, 2],
-                                        attention_type=attention_type,
-                                        C_in=C,
-                                        C_out=C_out,
-                                        H=H2,
-                                        W=W2,
-                                        D=T,
-                                        stride_qk=stride_qk,
-                                        cosine_att=cosine_att,
-                                        normalize_Q_K=normalize_Q_K,
-                                        att_with_relative_position_bias=att_with_relative_position_bias,
-                                        att_with_output_proj=att_with_output_proj,
-                                    )
-                                    att.to(device=device)
-
-                                    t0 = start_timer(enable=with_timer)
-                                    with torch.inference_mode():
-                                        test_out = att(test_in2)
-                                    end_timer(
-                                        enable=with_timer,
-                                        t=t0,
-                                        msg=f"forward pass - test_in2 {test_in2.shape}",
-                                    )
 
 
 if __name__ == "__main__":

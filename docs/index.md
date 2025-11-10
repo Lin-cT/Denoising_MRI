@@ -53,7 +53,7 @@ just test
 Dataset for MR denoising training is not opened at this moment.
 
 ## Model
-Two models are released at https://huggingface.co/microsoft/SNRAware
+Three models are released at https://huggingface.co/microsoft/SNRAware
 
 - SNRAware-small: 27.7million parameters
 - SNRAware-medium: 55.1million parameters

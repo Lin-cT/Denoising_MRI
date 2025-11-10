@@ -57,7 +57,7 @@ Three models are released at https://huggingface.co/microsoft/SNRAware
 
 - SNRAware-small: 27.7million parameters
 - SNRAware-medium: 55.1million parameters
-- SNRAwarelarge: 109million parameters
+- SNRAware-large: 109million parameters
 
 ## Direct intended uses
 SNRAware is shared for research and technical development purposes only, to denoise MR images.

@@ -28,23 +28,8 @@ jobs:
     secrets: inherit
     with:
       sha: ${{ inputs.sha || github.sha }}
-  build-wheels:
-    uses: ./.github/workflows/build-wheels.yaml
-    secrets: inherit
-    with:
-      sha: ${{ inputs.sha || github.sha }}
-  build-containers:
-    uses: ./.github/workflows/build-containers.yaml
-    secrets: inherit
-    with:
-      sha: ${{ inputs.sha || github.sha }}
   build-docs:
     uses: ./.github/workflows/build-docs.yaml
-    secrets: inherit
-    with:
-      sha: ${{ inputs.sha || github.sha }}
-  codeql:
-    uses: ./.github/workflows/codeql.yaml
     secrets: inherit
     with:
       sha: ${{ inputs.sha || github.sha }}
@@ -52,14 +37,3 @@ jobs:
     if: github.event_name == 'pull_request'
     uses: ./.github/workflows/auto-merge.yaml
     secrets: inherit
-  release:
-    uses: ./.github/workflows/release.yaml
-    secrets: inherit
-    needs:
-      - build-containers
-      - build-docs
-      - build-wheels
-      - checks
-      - codeql
-    with:
-      publish-docs: ${{ github.ref_name == 'main' }}

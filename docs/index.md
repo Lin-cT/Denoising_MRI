@@ -23,30 +23,39 @@ This repository contains the Pytorch code in our paper [SNRAware: Improved Deep 
 
 ## Get started
 
-[just](https://github.com/casey/just) is used in this project. If not, please install this tool:
+[just](https://github.com/casey/just), [uv]() and [gif-lfs]() are used in this project. If not, please install this tool:
 
 ```bash
 # install just
-wget -qO - 'https://proget.makedeb.org/debian-feeds/prebuilt-mpr.pub' | gpg --dearmor | sudo tee /usr/share/keyrings/prebuilt-mpr-archive-keyring.gpg 1> /dev/null
-echo "deb [arch=all,$(dpkg --print-architecture) signed-by=/usr/share/keyrings/prebuilt-mpr-archive-keyring.gpg] https://proget.makedeb.org prebuilt-mpr $(lsb_release -cs)" | sudo tee /etc/apt/sources.list.d/prebuilt-mpr.list
+curl -fsSL https://just.systems/install.sh | sudo bash -s -- --to /usr/local/bin
+
+# install uv
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# install git-lfs
 sudo apt update
-sudo apt install just -y
+sudo apt install git-lfs
+```
+
+Make sure commands `just`, `us` are on your path.
+
+Also, this project requires NVIDIA GPU. To check whether your GPU is available and is working:
+
+```bash
+nvidia-smi
 ```
 
 Then, please set up the virtual environment and run tests:
 
 ```bash
-# show the list
-just --list
+# set up env
+uv sync
 
-# set up virtual environment
-just setup-env
+# pull down test data
+git lfs pull
 
-# review documentation
-just serve-docs
-
-# run test
-just test
+# run the test
+uv run pytest -m gpu ./test
 ```
 
 ## Data

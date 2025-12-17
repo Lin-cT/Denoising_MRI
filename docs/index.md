@@ -8,10 +8,10 @@ This repository contains the Pytorch code in our paper [SNRAware: Improved Deep 
     author = {Xue, Hui and Hooper, Sarah M. and Pierce, Iain and Davies, Rhodri H. and Stairs, John and Naegele, Joseph and Campbell-Washburn, Adrienne E. and Manisty, Charlotte and Moon, James C. and Treibel, Thomas A. and Hansen, Michael S. and Kellman, Peter},
     title = {SNRAware: Improved Deep Learning MRI Denoising with Signal-to-noise Ratio Unit Training and G-factor Map Augmentation},
     journal = {Radiology: Artificial Intelligence},
-    volume = {0},
-    number = {ja},
+    volume = {7},
+    number = {6},
     pages = {e250227},
-    year = {0},
+    year = {2025},
     doi = {10.1148/ryai.250227},
     note ={PMID: 41123451},
     URL = {https://doi.org/10.1148/ryai.250227}

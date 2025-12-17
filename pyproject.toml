@@ -10,8 +10,9 @@ authors = [
 keywords = []
 license = "MIT"
 dependencies = [
-    "mkl-fft>=2.0.0",
-    "mkl-service>=2.4.2",
+    "mkl",
+    "mkl-fft",
+    "mkl-service",
     "typing_extensions",
     "click",
     "h5py",
@@ -77,15 +78,6 @@ build-backend = "uv_build"
 
 [tool.uv.build-backend]
 module-name = ["snraware"]
-
-[[tool.uv.index]]
-name = "mkl"
-url = "https://urob.github.io/numpy-mkl"
-
-[tool.uv.sources]
-numpy = { index = "mkl" }
-scipy = { index = "mkl" }
-mkl-service = { index = "mkl" }
 
 [project.scripts]
 

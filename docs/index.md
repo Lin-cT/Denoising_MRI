@@ -43,7 +43,7 @@ nvidia-smi
 ```
 If the GPU is working correctly, this command will display detailed information, including driver version, GPU usage, memory usage, and temperature.
 
-Then, please clone the repo, set up the virtual environment and run tests:
+Make sure the command `uv` are on your path. Then please clone the repo, set up the virtual environment and run tests:
 
 ```bash
 # clone the repo

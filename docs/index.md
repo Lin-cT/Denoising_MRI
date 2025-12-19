@@ -23,21 +23,18 @@ This repository contains the Pytorch code in our paper [SNRAware: Improved Deep 
 
 ## Get started
 
-[just](https://github.com/casey/just), [uv]() and [gif-lfs]() are used in this project. If not, please install this tool:
+`uv` is used in this project. Please install it as:
 
 ```bash
-# install just
-curl -fsSL https://just.systems/install.sh | sudo bash -s -- --to /usr/local/bin
-
 # install uv
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # install git-lfs
 sudo apt update
-sudo apt install git-lfs
+sudo apt install git-lfs direnv
 ```
 
-Make sure commands `just` and `uv` are on your path.
+Make sure commands `uv` are on your path.
 
 Also, this project requires NVIDIA GPU. To check whether your GPU is available and is working:
 
@@ -74,8 +71,8 @@ To test the model,
 ```bash
 # download the model from the huggingface
 # small model
-wget https://huggingface.co/microsoft/SNRAware/blob/main/small/snraware_small_model.pts
-wget https://huggingface.co/microsoft/SNRAware/blob/main/small/snraware_small_model.yaml
+wget https://huggingface.co/microsoft/SNRAware/resolve/main/small/snraware_small_model.pts
+wget https://huggingface.co/microsoft/SNRAware/resolve/main/small/snraware_small_model.yaml
 
 # a test data is provided at ./test/data/inference
 # input data are [H, W, Frame] 3D complex tensor, input_real.npy and input_imag.npy store the 
@@ -90,7 +87,11 @@ export config_file=snraware_small_model.yaml
 uv run python3 ./src/snraware/projects/mri/denoising/run_inference.py --input_dir ./test/data/phantom --output_dir /tmp/phantom_res_inference --saved_model_path $model_file --saved_config_path $config_file --batch_size 1 --input_fname input --gmap_fname gmap
 ```
 
-After the run, the result is saved in the `/tmp/phantom_res_inference` as numpy file. 
+After the run, the result is saved in the `/tmp/phantom_res_inference` as numpy files. 
+
+![alt text](./docs/images/image.png)
+
+raw, model output, difference
 
 ## Direct intended uses
 SNRAware is shared for research and technical development purposes only, to denoise MR images.

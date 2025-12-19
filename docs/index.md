@@ -43,10 +43,15 @@ nvidia-smi
 ```
 If the GPU is working correctly, this command will display detailed information, including driver version, GPU usage, memory usage, and temperature.
 
-Then, please set up the virtual environment and run tests:
+Then, please clone the repo, set up the virtual environment and run tests:
 
 ```bash
+# clone the repo
+git clone git@github.com:microsoft/SNRAware.git
+
 # set up env
+direnv allow
+cd ./SNRAware
 uv sync
 
 # pull down test data
@@ -94,7 +99,7 @@ After the run, the result is saved in the `/tmp/phantom_res_inference` as numpy 
 raw, model output, difference
 
 ## Direct intended uses
-SNRAware is shared for research and technical development purposes only, to denoise MR images.
+SNRAware is shared for research and technical development purposes only, to denoisegit  MR images.
 
 ## License and Usage Notices
 The data, code, and model checkpoints described in this repository is provided for research and technical development use

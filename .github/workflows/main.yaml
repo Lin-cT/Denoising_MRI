@@ -33,7 +33,21 @@ jobs:
     secrets: inherit
     with:
       sha: ${{ inputs.sha || github.sha }}
+  codeql:
+    uses: ./.github/workflows/codeql.yaml
+    secrets: inherit
+    with:
+      sha: ${{ inputs.sha || github.sha }}
   auto-merge:
     if: github.event_name == 'pull_request'
     uses: ./.github/workflows/auto-merge.yaml
     secrets: inherit
+  release:
+    uses: ./.github/workflows/release.yaml
+    secrets: inherit
+    needs:
+      - build-docs
+      - checks
+      - codeql
+    with:
+      publish-docs: ${{ github.ref_name == 'main' }}

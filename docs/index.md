@@ -37,7 +37,7 @@ sudo apt update
 sudo apt install git-lfs
 ```
 
-Make sure commands `just`, `us` are on your path.
+Make sure commands `just` and `uv` are on your path.
 
 Also, this project requires NVIDIA GPU. To check whether your GPU is available and is working:
 
@@ -61,7 +61,7 @@ uv run pytest -m gpu ./test
 
 ## Training data
 
-Dataset for MR denoising training is not opened at this moment.
+Dataset for MR denoising training is not opened at this moment. More information will be provided once training data is released.
 
 ## Model
 Three models are released at https://huggingface.co/microsoft/SNRAware

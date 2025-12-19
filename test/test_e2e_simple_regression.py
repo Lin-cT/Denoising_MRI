@@ -8,10 +8,10 @@ from hydra import compose, initialize
 from lightning.pytorch.callbacks import ModelCheckpoint, ModelSummary, TQDMProgressBar
 from omegaconf import OmegaConf
 
-from snraware.components.setup import get_device
 from snraware.components.heads import PreConv2D, SimpleConv2d
 from snraware.components.model import HRnet, SOAnet, Unet
 from snraware.components.optim import OptimScheduler
+from snraware.components.setup import get_device
 
 # -----------------------------------------------------------------
 

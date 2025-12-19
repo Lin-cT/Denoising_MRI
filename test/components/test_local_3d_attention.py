@@ -29,8 +29,7 @@ class TestLocal3DAttention:
 
     @pytest.mark.gpu
     def test(self):
-
-        device = get_device()        
+        device = get_device()
         if device != "cuda":
             pytest.skip("GPU only test")
 

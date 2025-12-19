@@ -57,7 +57,7 @@ class TestSOAnet:
         device = get_device()
         if device != "cuda":
             pytest.skip("GPU only test")
-                        
+
         _B, C, T, H, W = 1, 4, 8, 32, 32
         test_in = torch.from_numpy(self.test_in).to(dtype=torch.float32, device=device)
 

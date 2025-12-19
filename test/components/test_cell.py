@@ -33,7 +33,7 @@ class TestCell:
         device = get_device()
         if device != "cuda":
             pytest.skip("GPU only test")
-        
+
         test_in = test_in.to(device=device)
 
         att_types = [

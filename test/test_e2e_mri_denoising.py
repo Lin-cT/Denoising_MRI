@@ -7,7 +7,7 @@ import pytest
 import torch
 from hydra import compose, initialize
 
-from snraware.components.setup import end_timer, start_timer, get_device
+from snraware.components.setup import end_timer, get_device, start_timer
 from snraware.projects.mri.denoising.inference_model import (
     load_lit_model,
     load_model,

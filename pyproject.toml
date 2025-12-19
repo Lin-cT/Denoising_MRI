@@ -3,7 +3,7 @@ name = "snraware"
 description = "A deep learning imaging AI framework"
 version = "0.1.0"
 readme = "README.md"
-requires-python = ">=3.12,<4.0"
+requires-python = ">=3.12,<=3.14"
 authors = [
     {name = "Hui Xue", email = "xueh@microsoft.com"},
 ]

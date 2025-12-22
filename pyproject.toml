@@ -20,7 +20,7 @@ dependencies = [
     "pathlib",
     "PyWavelets",
     "pytorch-wavelets",
-    "torchmetrics==1.7.3",
+    "torchmetrics==1.8.2",
     "torch-interpol",
     "piq",
     "imageio",
